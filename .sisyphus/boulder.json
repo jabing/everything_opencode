@@ -1,0 +1,12 @@
+{
+  "active_plan": "C:\\dev_projects\\everything-claude-code\\.sisyphus\\plans\\opencode-agent-conversion.md",
+  "started_at": "2026-02-25T20:54:27.961Z",
+  "session_ids": [
+    "ses_3698a28adffeUO9eJTNpPLMpv0"
+  ],
+  "plan_name": "opencode-agent-conversion",
+  "agent": "atlas",
+  "completed_tasks": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
+  "completed_tasks": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "F1", "F2", "F3", "F4"],
+  "current_wave": "Complete"
+}

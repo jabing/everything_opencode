@@ -1,0 +1,3 @@
+JSON validation:
+Agents: 13
+Commands: 24
