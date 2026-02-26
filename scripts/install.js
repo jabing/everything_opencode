@@ -217,6 +217,7 @@ async function installGlobal() {
   
   const projectDir = process.cwd()
   const pluginsDir = path.join(projectDir, '.opencode')
+  const agentsDir = path.join(projectDir, 'agents')
   const skillsDir = path.join(projectDir, 'skills')
   const commandsDir = path.join(projectDir, 'commands')
   const agentsMdPath = path.join(projectDir, 'AGENTS.md')
@@ -232,6 +233,8 @@ async function installGlobal() {
     copyDir(instructionsDir, path.join(globalConfigDir, 'instructions'))
   }
 
+  logInfo('Copying agents...')
+  copyDir(agentsDir, path.join(globalConfigDir, 'agents'))
   logInfo('Copying skills...')
   copyDir(skillsDir, path.join(globalConfigDir, 'skills'))
   
@@ -251,8 +254,6 @@ async function installGlobal() {
   }
 
   // Update global opencode.json with agent definitions
-  // Primary agents (visible in /Agents)
-  // Hidden agents (only accessible via commands, use hidden: true)
   const config = {
     $schema: 'https://opencode.ai/config.json',
     instructions: [
@@ -270,25 +271,23 @@ async function installGlobal() {
     ],
     default_agent: 'eoc_build',
     agent: {
-      // === PRIMARY AGENTS (visible) ===
       eoc_build: {
         description: 'EOC - Primary coding agent for development work',
         mode: 'primary',
         tools: { write: true, edit: true, bash: true, read: true }
       },
-      'eoc_planner': {
+      eoc_planner: {
         description: 'EOC - Expert planning specialist for complex features',
         mode: 'primary',
         prompt: '{file:prompts/agents/planner.md}',
         tools: { read: true, bash: true, write: false, edit: false }
       },
-      'eoc_code-reviewer': {
+      eoc_code_reviewer: {
         description: 'EOC - Expert code review specialist',
         mode: 'primary',
         prompt: '{file:prompts/agents/code-reviewer.md}',
         tools: { read: true, bash: true, write: false, edit: false }
       },
-      // === HIDDEN AGENTS (command-only) ===
       'tdd-guide': {
         description: 'TDD specialist - write tests first, 80%+ coverage',
         hidden: true,
@@ -358,90 +357,32 @@ async function installGlobal() {
     },
     plugin: ['.opencode'],
     command: {
-      plan: {
-        description: 'Create a detailed implementation plan for complex features',
-        template: '{file:commands/plan.md}\n\n$ARGUMENTS',
-        agent: 'eoc_planner',
-        subtask: true
-      },
-      tdd: {
-        description: 'Enforce TDD workflow with 80%+ test coverage',
-        template: '{file:commands/tdd.md}\n\n$ARGUMENTS',
-        agent: 'tdd-guide',
-        subtask: true
-      },
-      'code-review': {
-        description: 'Review code for quality, security, and maintainability',
-        template: '{file:commands/code-review.md}\n\n$ARGUMENTS',
-        agent: 'eoc_code-reviewer',
-        subtask: true
-      },
-      security: {
-        description: 'Run comprehensive security review',
-        template: '{file:commands/security.md}\n\n$ARGUMENTS',
-        agent: 'security-reviewer',
-        subtask: true
-      },
-      'build-fix': {
-        description: 'Fix build and TypeScript errors with minimal changes',
-        template: '{file:commands/build-fix.md}\n\n$ARGUMENTS',
-        agent: 'build-error-resolver',
-        subtask: true
-      },
-      e2e: {
-        description: 'Generate and run E2E tests with Playwright',
-        template: '{file:commands/e2e.md}\n\n$ARGUMENTS',
-        agent: 'e2e-runner',
-        subtask: true
-      },
-      'refactor-clean': {
-        description: 'Remove dead code and consolidate duplicates',
-        template: '{file:commands/refactor-clean.md}\n\n$ARGUMENTS',
-        agent: 'refactor-cleaner',
-        subtask: true
-      },
-      orchestrate: {
-        description: 'Orchestrate multiple agents for complex tasks',
-        template: '{file:commands/orchestrate.md}\n\n$ARGUMENTS',
-        agent: 'eoc_planner',
-        subtask: true
-      },
-      'update-docs': {
-        description: 'Update documentation',
-        template: '{file:commands/update-docs.md}\n\n$ARGUMENTS',
-        agent: 'doc-updater',
-        subtask: true
-      },
-      'update-codemaps': {
-        description: 'Update codemaps',
-        template: '{file:commands/update-codemaps.md}\n\n$ARGUMENTS',
-        agent: 'doc-updater',
-        subtask: true
-      },
-      'test-coverage': {
-        description: 'Analyze test coverage',
-        template: '{file:commands/test-coverage.md}\n\n$ARGUMENTS',
-        agent: 'tdd-guide',
-        subtask: true
-      },
-      'go-review': {
-        description: 'Go code review',
-        template: '{file:commands/go-review.md}\n\n$ARGUMENTS',
-        agent: 'go-reviewer',
-        subtask: true
-      },
-      'go-test': {
-        description: 'Go TDD workflow',
-        template: '{file:commands/go-test.md}\n\n$ARGUMENTS',
-        agent: 'tdd-guide',
-        subtask: true
-      },
-      'go-build': {
-        description: 'Fix Go build errors',
-        template: '{file:commands/go-build.md}\n\n$ARGUMENTS',
-        agent: 'go-build-resolver',
-        subtask: true
-      }
+      plan: { description: 'Create implementation plan', template: '{file:commands/plan.md}\n\n$ARGUMENTS', agent: 'eoc_planner', subtask: true },
+      tdd: { description: 'Enforce TDD workflow', template: '{file:commands/tdd.md}\n\n$ARGUMENTS', agent: 'tdd-guide', subtask: true },
+      'code-review': { description: 'Review code quality', template: '{file:commands/code-review.md}\n\n$ARGUMENTS', agent: 'eoc_code_reviewer', subtask: true },
+      security: { description: 'Security review', template: '{file:commands/security.md}\n\n$ARGUMENTS', agent: 'security-reviewer', subtask: true },
+      'build-fix': { description: 'Fix build errors', template: '{file:commands/build-fix.md}\n\n$ARGUMENTS', agent: 'build-error-resolver', subtask: true },
+      e2e: { description: 'E2E tests', template: '{file:commands/e2e.md}\n\n$ARGUMENTS', agent: 'e2e-runner', subtask: true },
+      'refactor-clean': { description: 'Remove dead code', template: '{file:commands/refactor-clean.md}\n\n$ARGUMENTS', agent: 'refactor-cleaner', subtask: true },
+      orchestrate: { description: 'Orchestrate agents', template: '{file:commands/orchestrate.md}\n\n$ARGUMENTS', agent: 'eoc_planner', subtask: true },
+      'update-docs': { description: 'Update documentation', template: '{file:commands/update-docs.md}\n\n$ARGUMENTS', agent: 'doc-updater', subtask: true },
+      'update-codemaps': { description: 'Update codemaps', template: '{file:commands/update-codemaps.md}\n\n$ARGUMENTS', agent: 'doc-updater', subtask: true },
+      'test-coverage': { description: 'Analyze coverage', template: '{file:commands/test-coverage.md}\n\n$ARGUMENTS', agent: 'tdd-guide', subtask: true },
+      'go-review': { description: 'Go review', template: '{file:commands/go-review.md}\n\n$ARGUMENTS', agent: 'go-reviewer', subtask: true },
+      'go-test': { description: 'Go TDD', template: '{file:commands/go-test.md}\n\n$ARGUMENTS', agent: 'tdd-guide', subtask: true },
+      'go-build': { description: 'Fix Go build', template: '{file:commands/go-build.md}\n\n$ARGUMENTS', agent: 'go-build-resolver', subtask: true },
+      'python-review': { description: 'Python review', template: '{file:commands/python-review.md}\n\n$ARGUMENTS', agent: 'python-reviewer', subtask: true },
+      verify: { description: 'Verification loop', template: '{file:commands/verify.md}\n\n$ARGUMENTS' },
+      learn: { description: 'Extract patterns', template: '{file:commands/learn.md}\n\n$ARGUMENTS' },
+      'learn-eval': { description: 'Evaluate patterns', template: '{file:commands/learn-eval.md}\n\n$ARGUMENTS' },
+      checkpoint: { description: 'Save progress', template: '{file:commands/checkpoint.md}\n\n$ARGUMENTS' },
+      eval: { description: 'Run evaluation', template: '{file:commands/eval.md}\n\n$ARGUMENTS' },
+      evolve: { description: 'Cluster instincts', template: '{file:commands/evolve.md}\n\n$ARGUMENTS' },
+      'skill-create': { description: 'Create skill', template: '{file:commands/skill-create.md}\n\n$ARGUMENTS' },
+      'setup-pm': { description: 'Configure PM', template: '{file:commands/setup-pm.md}\n\n$ARGUMENTS' },
+      'instinct-status': { description: 'View instincts', template: '{file:commands/instinct-status.md}\n\n$ARGUMENTS' },
+      'instinct-import': { description: 'Import instincts', template: '{file:commands/instinct-import.md}\n\n$ARGUMENTS' },
+      'instinct-export': { description: 'Export instincts', template: '{file:commands/instinct-export.md}\n\n$ARGUMENTS' }
     }
   }
   writeJson(globalConfigPath, config)

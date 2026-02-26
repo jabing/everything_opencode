@@ -1,6 +1,42 @@
 # Everything OpenCode — Agent Instructions
 
 This is a **production-ready AI coding plugin** providing 13 specialized agents, 50+ skills, 33 commands, and automated hook workflows for software development.
+## Installation
+
+### Quick Start
+```bash
+git clone https://github.com/jabing/everything_opencode.git
+cd everything_opencode
+node scripts/install.js
+```
+
+Choose either:
+1. **Project-level** - Installs to `.opencode/` in current directory
+2. **Global** - Installs to OpenCode's global config directory
+
+The installer will:
+- Copy all agents, skills, and commands to the correct locations
+- Update OpenCode's configuration to recognize the new capabilities
+- Show confirmation when complete
+
+### Manual Installation
+```bash
+# Copy files manually
+cp -r agents skills commands .opencode/
+
+# Or use the install script with options
+node scripts/install.js --global
+node scripts/install.js --project
+
+# To uninstall
+node scripts/uninstall.js
+```
+
+### Verification
+After installation, restart OpenCode and verify:
+- Run `/agents` to see the 13 agents (3 visible, 10 hidden via slash commands)
+- Run `/help` to see all available commands
+
 
 ## Core Principles
 
