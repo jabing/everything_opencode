@@ -86,7 +86,8 @@ everything_opencode/
 │   ├── hooks/           # Automated hooks
 │   ├── plugins/         # Plugin definitions
 │   └── tools/           # Custom tools
-├── agents/              # 13 specialized agents
+├── prompts/             # Agent prompts (13 agents)
+│   └── agents/
 ├── commands/            # 33 slash commands
 ├── skills/              # 50+ workflow skills
 └── AGENTS.md            # Agent instructions

@@ -1,172 +1,88 @@
+---
+description: Orchestrate multiple agents for complex tasks
+agent: planner
+subtask: true
+---
+
 # Orchestrate Command
 
-Sequential agent workflow for complex tasks.
+Orchestrate multiple specialized agents for this complex task: $ARGUMENTS
 
-## Usage
+## Your Task
 
-`/orchestrate [workflow-type] [task-description]`
+1. **Analyze task complexity** and break into subtasks
+2. **Identify optimal agents** for each subtask
+3. **Create execution plan** with dependencies
+4. **Coordinate execution** - parallel where possible
+5. **Synthesize results** into unified output
 
-## Workflow Types
+## Available Agents
 
-### feature
-Full feature implementation workflow:
+| Agent | Specialty | Use For |
+|-------|-----------|---------|
+| planner | Implementation planning | Complex feature design |
+| architect | System design | Architectural decisions |
+| code-reviewer | Code quality | Review changes |
+| security-reviewer | Security analysis | Vulnerability detection |
+| tdd-guide | Test-driven dev | Feature implementation |
+| build-error-resolver | Build fixes | TypeScript/build errors |
+| e2e-runner | E2E testing | User flow testing |
+| doc-updater | Documentation | Updating docs |
+| refactor-cleaner | Code cleanup | Dead code removal |
+| go-reviewer | Go code | Go-specific review |
+| go-build-resolver | Go builds | Go build errors |
+| database-reviewer | Database | Query optimization |
+
+## Orchestration Patterns
+
+### Sequential Execution
 ```
-planner -> tdd-guide -> code-reviewer -> security-reviewer
+planner → tdd-guide → code-reviewer → security-reviewer
 ```
+Use when: Later tasks depend on earlier results
 
-### bugfix
-Bug investigation and fix workflow:
+### Parallel Execution
 ```
-planner -> tdd-guide -> code-reviewer
+┌→ security-reviewer
+planner →├→ code-reviewer
+└→ architect
 ```
+Use when: Tasks are independent
 
-### refactor
-Safe refactoring workflow:
+### Fan-Out/Fan-In
 ```
-architect -> code-reviewer -> tdd-guide
+         ┌→ agent-1 ─┐
+planner →├→ agent-2 ─┼→ synthesizer
+         └→ agent-3 ─┘
 ```
+Use when: Multiple perspectives needed
 
-### security
-Security-focused review:
-```
-security-reviewer -> code-reviewer -> architect
-```
+## Execution Plan Format
 
-## Execution Pattern
+### Phase 1: [Name]
+- Agent: [agent-name]
+- Task: [specific task]
+- Depends on: [none or previous phase]
 
-For each agent in the workflow:
+### Phase 2: [Name] (parallel)
+- Agent A: [agent-name]
+  - Task: [specific task]
+- Agent B: [agent-name]
+  - Task: [specific task]
+- Depends on: Phase 1
 
-1. **Invoke agent** with context from previous agent
-2. **Collect output** as structured handoff document
-3. **Pass to next agent** in chain
-4. **Aggregate results** into final report
+### Phase 3: Synthesis
+- Combine results from Phase 2
+- Generate unified output
 
-## Handoff Document Format
+## Coordination Rules
 
-Between agents, create handoff document:
+1. **Plan before execute** - Create full execution plan first
+2. **Minimize handoffs** - Reduce context switching
+3. **Parallelize when possible** - Independent tasks in parallel
+4. **Clear boundaries** - Each agent has specific scope
+5. **Single source of truth** - One agent owns each artifact
 
-```markdown
-## HANDOFF: [previous-agent] -> [next-agent]
+---
 
-### Context
-[Summary of what was done]
-
-### Findings
-[Key discoveries or decisions]
-
-### Files Modified
-[List of files touched]
-
-### Open Questions
-[Unresolved items for next agent]
-
-### Recommendations
-[Suggested next steps]
-```
-
-## Example: Feature Workflow
-
-```
-/orchestrate feature "Add user authentication"
-```
-
-Executes:
-
-1. **Planner Agent**
-   - Analyzes requirements
-   - Creates implementation plan
-   - Identifies dependencies
-   - Output: `HANDOFF: planner -> tdd-guide`
-
-2. **TDD Guide Agent**
-   - Reads planner handoff
-   - Writes tests first
-   - Implements to pass tests
-   - Output: `HANDOFF: tdd-guide -> code-reviewer`
-
-3. **Code Reviewer Agent**
-   - Reviews implementation
-   - Checks for issues
-   - Suggests improvements
-   - Output: `HANDOFF: code-reviewer -> security-reviewer`
-
-4. **Security Reviewer Agent**
-   - Security audit
-   - Vulnerability check
-   - Final approval
-   - Output: Final Report
-
-## Final Report Format
-
-```
-ORCHESTRATION REPORT
-====================
-Workflow: feature
-Task: Add user authentication
-Agents: planner -> tdd-guide -> code-reviewer -> security-reviewer
-
-SUMMARY
--------
-[One paragraph summary]
-
-AGENT OUTPUTS
--------------
-Planner: [summary]
-TDD Guide: [summary]
-Code Reviewer: [summary]
-Security Reviewer: [summary]
-
-FILES CHANGED
--------------
-[List all files modified]
-
-TEST RESULTS
-------------
-[Test pass/fail summary]
-
-SECURITY STATUS
----------------
-[Security findings]
-
-RECOMMENDATION
---------------
-[SHIP / NEEDS WORK / BLOCKED]
-```
-
-## Parallel Execution
-
-For independent checks, run agents in parallel:
-
-```markdown
-### Parallel Phase
-Run simultaneously:
-- code-reviewer (quality)
-- security-reviewer (security)
-- architect (design)
-
-### Merge Results
-Combine outputs into single report
-```
-
-## Arguments
-
-$ARGUMENTS:
-- `feature <description>` - Full feature workflow
-- `bugfix <description>` - Bug fix workflow
-- `refactor <description>` - Refactoring workflow
-- `security <description>` - Security review workflow
-- `custom <agents> <description>` - Custom agent sequence
-
-## Custom Workflow Example
-
-```
-/orchestrate custom "architect,tdd-guide,code-reviewer" "Redesign caching layer"
-```
-
-## Tips
-
-1. **Start with planner** for complex features
-2. **Always include code-reviewer** before merge
-3. **Use security-reviewer** for auth/payment/PII
-4. **Keep handoffs concise** - focus on what next agent needs
-5. **Run verification** between agents if needed
+**NOTE**: Complex tasks benefit from multi-agent orchestration. Simple tasks should use single agents directly.

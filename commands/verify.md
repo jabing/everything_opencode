@@ -1,59 +1,67 @@
-# Verification Command
+---
+description: Run verification loop to validate implementation
+agent: build
+---
 
-Run comprehensive verification on current codebase state.
+# Verify Command
 
-## Instructions
+Run verification loop to validate the implementation: $ARGUMENTS
 
-Execute verification in this exact order:
+## Your Task
 
-1. **Build Check**
-   - Run the build command for this project
-   - If it fails, report errors and STOP
+Execute comprehensive verification:
 
-2. **Type Check**
-   - Run TypeScript/type checker
-   - Report all errors with file:line
+1. **Type Check**: `npx tsc --noEmit`
+2. **Lint**: `npm run lint`
+3. **Unit Tests**: `npm test`
+4. **Integration Tests**: `npm run test:integration` (if available)
+5. **Build**: `npm run build`
+6. **Coverage Check**: Verify 80%+ coverage
 
-3. **Lint Check**
-   - Run linter
-   - Report warnings and errors
+## Verification Checklist
 
-4. **Test Suite**
-   - Run all tests
-   - Report pass/fail count
-   - Report coverage percentage
+### Code Quality
+- [ ] No TypeScript errors
+- [ ] No lint warnings
+- [ ] No console.log statements
+- [ ] Functions < 50 lines
+- [ ] Files < 800 lines
 
-5. **Console.log Audit**
-   - Search for console.log in source files
-   - Report locations
+### Tests
+- [ ] All tests passing
+- [ ] Coverage >= 80%
+- [ ] Edge cases covered
+- [ ] Error conditions tested
 
-6. **Git Status**
-   - Show uncommitted changes
-   - Show files modified since last commit
+### Security
+- [ ] No hardcoded secrets
+- [ ] Input validation present
+- [ ] No SQL injection risks
+- [ ] No XSS vulnerabilities
 
-## Output
+### Build
+- [ ] Build succeeds
+- [ ] No warnings
+- [ ] Bundle size acceptable
 
-Produce a concise verification report:
+## Verification Report
 
-```
-VERIFICATION: [PASS/FAIL]
+### Summary
+- Status: ✅ PASS / ❌ FAIL
+- Score: X/Y checks passed
 
-Build:    [OK/FAIL]
-Types:    [OK/X errors]
-Lint:     [OK/X issues]
-Tests:    [X/Y passed, Z% coverage]
-Secrets:  [OK/X found]
-Logs:     [OK/X console.logs]
+### Details
+| Check | Status | Notes |
+|-------|--------|-------|
+| TypeScript | ✅/❌ | [details] |
+| Lint | ✅/❌ | [details] |
+| Tests | ✅/❌ | [details] |
+| Coverage | ✅/❌ | XX% (target: 80%) |
+| Build | ✅/❌ | [details] |
 
-Ready for PR: [YES/NO]
-```
+### Action Items
+[If FAIL, list what needs to be fixed]
 
-If any critical issues, list them with fix suggestions.
+---
 
-## Arguments
-
-$ARGUMENTS can be:
-- `quick` - Only build + types
-- `full` - All checks (default)
-- `pre-commit` - Checks relevant for commits
-- `pre-pr` - Full checks plus security scan
+**NOTE**: Verification loop should be run before every commit and PR.

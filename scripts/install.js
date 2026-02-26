@@ -217,7 +217,6 @@ async function installGlobal() {
   
   const projectDir = process.cwd()
   const pluginsDir = path.join(projectDir, '.opencode')
-  const agentsDir = path.join(projectDir, 'agents')
   const skillsDir = path.join(projectDir, 'skills')
   const commandsDir = path.join(projectDir, 'commands')
   const agentsMdPath = path.join(projectDir, 'AGENTS.md')
@@ -233,8 +232,6 @@ async function installGlobal() {
     copyDir(instructionsDir, path.join(globalConfigDir, 'instructions'))
   }
 
-  logInfo('Copying agents...')
-  copyDir(agentsDir, path.join(globalConfigDir, 'agents'))
   logInfo('Copying skills...')
   copyDir(skillsDir, path.join(globalConfigDir, 'skills'))
   
@@ -247,17 +244,33 @@ async function installGlobal() {
   }
   
   // Copy prompts directory (needed for agent prompts)
-  const promptsDir = path.join(projectDir, '.opencode', 'prompts')
+  const promptsDir = path.join(projectDir, 'prompts')
   if (dirExists(promptsDir)) {
     logInfo('Copying prompts...')
     copyDir(promptsDir, path.join(globalConfigDir, 'prompts'))
   }
 
   // Update global opencode.json with agent definitions
+  // Primary agents (visible in /Agents)
+  // Hidden agents (only accessible via commands, use hidden: true)
   const config = {
     $schema: 'https://opencode.ai/config.json',
+    instructions: [
+      'AGENTS.md',
+      'skills/tdd-workflow/SKILL.md',
+      'skills/security-review/SKILL.md',
+      'skills/coding-standards/SKILL.md',
+      'skills/frontend-patterns/SKILL.md',
+      'skills/backend-patterns/SKILL.md',
+      'skills/e2e-testing/SKILL.md',
+      'skills/verification-loop/SKILL.md',
+      'skills/api-design/SKILL.md',
+      'skills/strategic-compact/SKILL.md',
+      'skills/eval-harness/SKILL.md'
+    ],
     default_agent: 'eoc_build',
     agent: {
+      // === PRIMARY AGENTS (visible) ===
       eoc_build: {
         description: 'EOC - Primary coding agent for development work',
         mode: 'primary',
@@ -266,17 +279,170 @@ async function installGlobal() {
       'eoc_planner': {
         description: 'EOC - Expert planning specialist for complex features',
         mode: 'primary',
-        prompt: '{file:prompts/agents/planner.txt}',
+        prompt: '{file:prompts/agents/planner.md}',
         tools: { read: true, bash: true, write: false, edit: false }
       },
       'eoc_code-reviewer': {
         description: 'EOC - Expert code review specialist',
         mode: 'primary',
-        prompt: '{file:prompts/agents/code-reviewer.txt}',
+        prompt: '{file:prompts/agents/code-reviewer.md}',
+        tools: { read: true, bash: true, write: false, edit: false }
+      },
+      // === HIDDEN AGENTS (command-only) ===
+      'tdd-guide': {
+        description: 'TDD specialist - write tests first, 80%+ coverage',
+        hidden: true,
+        prompt: '{file:prompts/agents/tdd-guide.md}',
+        tools: { read: true, write: true, edit: true, bash: true }
+      },
+      'security-reviewer': {
+        description: 'Security vulnerability detection and audit',
+        hidden: true,
+        prompt: '{file:prompts/agents/security-reviewer.md}',
+        tools: { read: true, bash: true, write: false, edit: false }
+      },
+      'build-error-resolver': {
+        description: 'Fix build and TypeScript errors',
+        hidden: true,
+        prompt: '{file:prompts/agents/build-error-resolver.md}',
+        tools: { read: true, write: true, edit: true, bash: true }
+      },
+      'e2e-runner': {
+        description: 'End-to-end Playwright testing',
+        hidden: true,
+        prompt: '{file:prompts/agents/e2e-runner.md}',
+        tools: { read: true, write: true, edit: true, bash: true }
+      },
+      'refactor-cleaner': {
+        description: 'Remove dead code and consolidate duplicates',
+        hidden: true,
+        prompt: '{file:prompts/agents/refactor-cleaner.md}',
+        tools: { read: true, write: true, edit: true, bash: true }
+      },
+      'doc-updater': {
+        description: 'Documentation and codemap updates',
+        hidden: true,
+        prompt: '{file:prompts/agents/doc-updater.md}',
+        tools: { read: true, write: true, edit: true, bash: true }
+      },
+      'go-reviewer': {
+        description: 'Go code review specialist',
+        hidden: true,
+        prompt: '{file:prompts/agents/go-reviewer.md}',
+        tools: { read: true, bash: true, write: false, edit: false }
+      },
+      'go-build-resolver': {
+        description: 'Fix Go build errors',
+        hidden: true,
+        prompt: '{file:prompts/agents/go-build-resolver.md}',
+        tools: { read: true, write: true, edit: true, bash: true }
+      },
+      'database-reviewer': {
+        description: 'PostgreSQL/Supabase schema and query optimization',
+        hidden: true,
+        prompt: '{file:prompts/agents/database-reviewer.md}',
+        tools: { read: true, bash: true, write: false, edit: false }
+      },
+      'architect': {
+        description: 'System design and scalability decisions',
+        hidden: true,
+        prompt: '{file:prompts/agents/architect.md}',
+        tools: { read: true, bash: true, write: false, edit: false }
+      },
+      'python-reviewer': {
+        description: 'Python code review specialist',
+        hidden: true,
+        prompt: '{file:prompts/agents/python-reviewer.md}',
         tools: { read: true, bash: true, write: false, edit: false }
       }
     },
-    plugin: ['.opencode']
+    plugin: ['.opencode'],
+    command: {
+      plan: {
+        description: 'Create a detailed implementation plan for complex features',
+        template: '{file:commands/plan.md}\n\n$ARGUMENTS',
+        agent: 'eoc_planner',
+        subtask: true
+      },
+      tdd: {
+        description: 'Enforce TDD workflow with 80%+ test coverage',
+        template: '{file:commands/tdd.md}\n\n$ARGUMENTS',
+        agent: 'tdd-guide',
+        subtask: true
+      },
+      'code-review': {
+        description: 'Review code for quality, security, and maintainability',
+        template: '{file:commands/code-review.md}\n\n$ARGUMENTS',
+        agent: 'eoc_code-reviewer',
+        subtask: true
+      },
+      security: {
+        description: 'Run comprehensive security review',
+        template: '{file:commands/security.md}\n\n$ARGUMENTS',
+        agent: 'security-reviewer',
+        subtask: true
+      },
+      'build-fix': {
+        description: 'Fix build and TypeScript errors with minimal changes',
+        template: '{file:commands/build-fix.md}\n\n$ARGUMENTS',
+        agent: 'build-error-resolver',
+        subtask: true
+      },
+      e2e: {
+        description: 'Generate and run E2E tests with Playwright',
+        template: '{file:commands/e2e.md}\n\n$ARGUMENTS',
+        agent: 'e2e-runner',
+        subtask: true
+      },
+      'refactor-clean': {
+        description: 'Remove dead code and consolidate duplicates',
+        template: '{file:commands/refactor-clean.md}\n\n$ARGUMENTS',
+        agent: 'refactor-cleaner',
+        subtask: true
+      },
+      orchestrate: {
+        description: 'Orchestrate multiple agents for complex tasks',
+        template: '{file:commands/orchestrate.md}\n\n$ARGUMENTS',
+        agent: 'eoc_planner',
+        subtask: true
+      },
+      'update-docs': {
+        description: 'Update documentation',
+        template: '{file:commands/update-docs.md}\n\n$ARGUMENTS',
+        agent: 'doc-updater',
+        subtask: true
+      },
+      'update-codemaps': {
+        description: 'Update codemaps',
+        template: '{file:commands/update-codemaps.md}\n\n$ARGUMENTS',
+        agent: 'doc-updater',
+        subtask: true
+      },
+      'test-coverage': {
+        description: 'Analyze test coverage',
+        template: '{file:commands/test-coverage.md}\n\n$ARGUMENTS',
+        agent: 'tdd-guide',
+        subtask: true
+      },
+      'go-review': {
+        description: 'Go code review',
+        template: '{file:commands/go-review.md}\n\n$ARGUMENTS',
+        agent: 'go-reviewer',
+        subtask: true
+      },
+      'go-test': {
+        description: 'Go TDD workflow',
+        template: '{file:commands/go-test.md}\n\n$ARGUMENTS',
+        agent: 'tdd-guide',
+        subtask: true
+      },
+      'go-build': {
+        description: 'Fix Go build errors',
+        template: '{file:commands/go-build.md}\n\n$ARGUMENTS',
+        agent: 'go-build-resolver',
+        subtask: true
+      }
+    }
   }
   writeJson(globalConfigPath, config)
   logSuccess('Updated global opencode.json')

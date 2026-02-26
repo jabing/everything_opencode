@@ -1,62 +1,56 @@
-# Build and Fix
+---
+description: Fix build and TypeScript errors with minimal changes
+agent: build-error-resolver
+subtask: true
+---
 
-Incrementally fix build and type errors with minimal, safe changes.
+# Build Fix Command
 
-## Step 1: Detect Build System
+Fix build and TypeScript errors with minimal changes: $ARGUMENTS
 
-Identify the project's build tool and run the build:
+## Your Task
 
-| Indicator | Build Command |
-|-----------|---------------|
-| `package.json` with `build` script | `npm run build` or `pnpm build` |
-| `tsconfig.json` (TypeScript only) | `npx tsc --noEmit` |
-| `Cargo.toml` | `cargo build 2>&1` |
-| `pom.xml` | `mvn compile` |
-| `build.gradle` | `./gradlew compileJava` |
-| `go.mod` | `go build ./...` |
-| `pyproject.toml` | `python -m py_compile` or `mypy .` |
+1. **Run type check**: `npx tsc --noEmit`
+2. **Collect all errors**
+3. **Fix errors one by one** with minimal changes
+4. **Verify each fix** doesn't introduce new errors
+5. **Run final check** to confirm all errors resolved
 
-## Step 2: Parse and Group Errors
+## Approach
 
-1. Run the build command and capture stderr
-2. Group errors by file path
-3. Sort by dependency order (fix imports/types before logic errors)
-4. Count total errors for progress tracking
+### DO:
+- ✅ Fix type errors with correct types
+- ✅ Add missing imports
+- ✅ Fix syntax errors
+- ✅ Make minimal changes
+- ✅ Preserve existing behavior
+- ✅ Run `tsc --noEmit` after each change
 
-## Step 3: Fix Loop (One Error at a Time)
+### DON'T:
+- ❌ Refactor code
+- ❌ Add new features
+- ❌ Change architecture
+- ❌ Use `any` type (unless absolutely necessary)
+- ❌ Add `@ts-ignore` comments
+- ❌ Change business logic
 
-For each error:
+## Common Error Fixes
 
-1. **Read the file** — Use Read tool to see error context (10 lines around the error)
-2. **Diagnose** — Identify root cause (missing import, wrong type, syntax error)
-3. **Fix minimally** — Use Edit tool for the smallest change that resolves the error
-4. **Re-run build** — Verify the error is gone and no new errors introduced
-5. **Move to next** — Continue with remaining errors
+| Error | Fix |
+|-------|-----|
+| Type 'X' is not assignable to type 'Y' | Add correct type annotation |
+| Property 'X' does not exist | Add property to interface or fix property name |
+| Cannot find module 'X' | Install package or fix import path |
+| Argument of type 'X' is not assignable | Cast or fix function signature |
+| Object is possibly 'undefined' | Add null check or optional chaining |
 
-## Step 4: Guardrails
+## Verification Steps
 
-Stop and ask the user if:
-- A fix introduces **more errors than it resolves**
-- The **same error persists after 3 attempts** (likely a deeper issue)
-- The fix requires **architectural changes** (not just a build fix)
-- Build errors stem from **missing dependencies** (need `npm install`, `cargo add`, etc.)
+After fixes:
+1. `npx tsc --noEmit` - should show 0 errors
+2. `npm run build` - should succeed
+3. `npm test` - tests should still pass
 
-## Step 5: Summary
+---
 
-Show results:
-- Errors fixed (with file paths)
-- Errors remaining (if any)
-- New errors introduced (should be zero)
-- Suggested next steps for unresolved issues
-
-## Recovery Strategies
-
-| Situation | Action |
-|-----------|--------|
-| Missing module/import | Check if package is installed; suggest install command |
-| Type mismatch | Read both type definitions; fix the narrower type |
-| Circular dependency | Identify cycle with import graph; suggest extraction |
-| Version conflict | Check `package.json` / `Cargo.toml` for version constraints |
-| Build tool misconfiguration | Read config file; compare with working defaults |
-
-Fix one error at a time for safety. Prefer minimal diffs over refactoring.
+**IMPORTANT**: Focus on fixing errors only. No refactoring, no improvements, no architectural changes. Get the build green with minimal diff.

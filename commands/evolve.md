@@ -1,193 +1,112 @@
 ---
-name: evolve
-description: Cluster related instincts into skills, commands, or agents
-command: true
+description: Cluster instincts into skills
+agent: build
 ---
 
 # Evolve Command
 
-## Implementation
+Cluster related instincts into structured skills: $ARGUMENTS
 
-Run the instinct CLI using the plugin root path:
+## Your Task
 
-```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" evolve [--generate]
-```
+Analyze instincts and promote clusters to skills.
 
-Or if `CLAUDE_PLUGIN_ROOT` is not set (manual installation):
+## Evolution Process
 
-```bash
-python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py evolve [--generate]
-```
+### Step 1: Analyze Instincts
 
-Analyzes instincts and clusters related ones into higher-level structures:
-- **Commands**: When instincts describe user-invoked actions
-- **Skills**: When instincts describe auto-triggered behaviors
-- **Agents**: When instincts describe complex, multi-step processes
+Group instincts by:
+- Trigger similarity
+- Action patterns
+- Category tags
+- Confidence levels
 
-## Usage
+### Step 2: Identify Clusters
 
 ```
-/evolve                    # Analyze all instincts and suggest evolutions
-/evolve --domain testing   # Only evolve instincts in testing domain
-/evolve --dry-run          # Show what would be created without creating
-/evolve --threshold 5      # Require 5+ related instincts to cluster
+Cluster: Error Handling
+├── Instinct: Catch specific errors (0.85)
+├── Instinct: Wrap errors with context (0.82)
+├── Instinct: Log errors with stack trace (0.78)
+└── Instinct: Return meaningful error messages (0.80)
 ```
 
-## Evolution Rules
+### Step 3: Generate Skill
 
-### → Command (User-Invoked)
-When instincts describe actions a user would explicitly request:
-- Multiple instincts about "when user asks to..."
-- Instincts with triggers like "when creating a new X"
-- Instincts that follow a repeatable sequence
+When cluster has:
+- 3+ instincts
+- Average confidence > 0.75
+- Cohesive theme
 
-Example:
-- `new-table-step1`: "when adding a database table, create migration"
-- `new-table-step2`: "when adding a database table, update schema"
-- `new-table-step3`: "when adding a database table, regenerate types"
+Generate SKILL.md:
 
-→ Creates: **new-table** command
-
-### → Skill (Auto-Triggered)
-When instincts describe behaviors that should happen automatically:
-- Pattern-matching triggers
-- Error handling responses
-- Code style enforcement
-
-Example:
-- `prefer-functional`: "when writing functions, prefer functional style"
-- `use-immutable`: "when modifying state, use immutable patterns"
-- `avoid-classes`: "when designing modules, avoid class-based design"
-
-→ Creates: `functional-patterns` skill
-
-### → Agent (Needs Depth/Isolation)
-When instincts describe complex, multi-step processes that benefit from isolation:
-- Debugging workflows
-- Refactoring sequences
-- Research tasks
-
-Example:
-- `debug-step1`: "when debugging, first check logs"
-- `debug-step2`: "when debugging, isolate the failing component"
-- `debug-step3`: "when debugging, create minimal reproduction"
-- `debug-step4`: "when debugging, verify fix with test"
-
-→ Creates: **debugger** agent
-
-## What to Do
-
-1. Read all instincts from `~/.claude/homunculus/instincts/`
-2. Group instincts by:
-   - Domain similarity
-   - Trigger pattern overlap
-   - Action sequence relationship
-3. For each cluster of 3+ related instincts:
-   - Determine evolution type (command/skill/agent)
-   - Generate the appropriate file
-   - Save to `~/.claude/homunculus/evolved/{commands,skills,agents}/`
-4. Link evolved structure back to source instincts
-
-## Output Format
-
-```
-🧬 Evolve Analysis
-==================
-
-Found 3 clusters ready for evolution:
-
-## Cluster 1: Database Migration Workflow
-Instincts: new-table-migration, update-schema, regenerate-types
-Type: Command
-Confidence: 85% (based on 12 observations)
-
-Would create: /new-table command
-Files:
-  - ~/.claude/homunculus/evolved/commands/new-table.md
-
-## Cluster 2: Functional Code Style
-Instincts: prefer-functional, use-immutable, avoid-classes, pure-functions
-Type: Skill
-Confidence: 78% (based on 8 observations)
-
-Would create: functional-patterns skill
-Files:
-  - ~/.claude/homunculus/evolved/skills/functional-patterns.md
-
-## Cluster 3: Debugging Process
-Instincts: debug-check-logs, debug-isolate, debug-reproduce, debug-verify
-Type: Agent
-Confidence: 72% (based on 6 observations)
-
-Would create: debugger agent
-Files:
-  - ~/.claude/homunculus/evolved/agents/debugger.md
-
----
-Run `/evolve --execute` to create these files.
-```
-
-## Flags
-
-- `--execute`: Actually create the evolved structures (default is preview)
-- `--dry-run`: Preview without creating
-- `--domain <name>`: Only evolve instincts in specified domain
-- `--threshold <n>`: Minimum instincts required to form cluster (default: 3)
-- `--type <command|skill|agent>`: Only create specified type
-
-## Generated File Format
-
-### Command
 ```markdown
----
-name: new-table
-description: Create a new database table with migration, schema update, and type generation
-command: /new-table
-evolved_from:
-  - new-table-migration
-  - update-schema
-  - regenerate-types
----
+# Error Handling Skill
 
-# New Table Command
+## Overview
+Patterns for robust error handling learned from session observations.
 
-[Generated content based on clustered instincts]
+## Patterns
 
-## Steps
-1. ...
-2. ...
+### 1. Catch Specific Errors
+**Trigger**: When catching errors with generic catch
+**Action**: Use specific error types
+
+### 2. Wrap Errors with Context
+**Trigger**: When re-throwing errors
+**Action**: Add context with fmt.Errorf or Error.cause
+
+### 3. Log with Stack Trace
+**Trigger**: When logging errors
+**Action**: Include stack trace for debugging
+
+### 4. Meaningful Messages
+**Trigger**: When returning errors to users
+**Action**: Provide actionable error messages
 ```
 
-### Skill
-```markdown
----
-name: functional-patterns
-description: Enforce functional programming patterns
-evolved_from:
-  - prefer-functional
-  - use-immutable
-  - avoid-classes
----
+### Step 4: Archive Instincts
 
-# Functional Patterns Skill
+Move evolved instincts to `archived/` with reference to skill.
 
-[Generated content based on clustered instincts]
+## Evolution Report
+
+```
+Evolution Summary
+=================
+
+Clusters Found: X
+
+Cluster 1: Error Handling
+- Instincts: 5
+- Avg Confidence: 0.82
+- Status: ✅ Promoted to skill
+
+Cluster 2: Testing Patterns
+- Instincts: 3
+- Avg Confidence: 0.71
+- Status: ⏳ Needs more confidence
+
+Cluster 3: Git Workflow
+- Instincts: 2
+- Avg Confidence: 0.88
+- Status: ⏳ Needs more instincts
+
+Skills Created:
+- skills/error-handling/SKILL.md
+
+Instincts Archived: 5
+Remaining Instincts: 12
 ```
 
-### Agent
-```markdown
----
-name: debugger
-description: Systematic debugging agent
-model: sonnet
-evolved_from:
-  - debug-check-logs
-  - debug-isolate
-  - debug-reproduce
+## Thresholds
+
+| Metric | Threshold |
+|--------|-----------|
+| Min instincts per cluster | 3 |
+| Min average confidence | 0.75 |
+| Min cluster cohesion | 0.6 |
+
 ---
 
-# Debugger Agent
-
-[Generated content based on clustered instincts]
-```
+**TIP**: Run `/evolve` periodically to graduate instincts to skills as confidence grows.

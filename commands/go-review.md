@@ -1,148 +1,71 @@
 ---
-description: Comprehensive Go code review for idiomatic patterns, concurrency safety, error handling, and security. Invokes the go-reviewer agent.
+description: Go code review for idiomatic patterns
+agent: go-reviewer
+subtask: true
 ---
 
-# Go Code Review
+# Go Review Command
 
-This command invokes the **go-reviewer** agent for comprehensive Go-specific code review.
+Review Go code for idiomatic patterns and best practices: $ARGUMENTS
 
-## What This Command Does
+## Your Task
 
-1. **Identify Go Changes**: Find modified `.go` files via `git diff`
-2. **Run Static Analysis**: Execute `go vet`, `staticcheck`, and `golangci-lint`
-3. **Security Scan**: Check for SQL injection, command injection, race conditions
-4. **Concurrency Review**: Analyze goroutine safety, channel usage, mutex patterns
-5. **Idiomatic Go Check**: Verify code follows Go conventions and best practices
-6. **Generate Report**: Categorize issues by severity
+1. **Analyze Go code** for idioms and patterns
+2. **Check concurrency** - goroutines, channels, mutexes
+3. **Review error handling** - proper error wrapping
+4. **Verify performance** - allocations, bottlenecks
 
-## When to Use
+## Review Checklist
 
-Use `/go-review` when:
-- After writing or modifying Go code
-- Before committing Go changes
-- Reviewing pull requests with Go code
-- Onboarding to a new Go codebase
-- Learning idiomatic Go patterns
+### Idiomatic Go
+- [ ] Package naming (lowercase, no underscores)
+- [ ] Variable naming (camelCase, short)
+- [ ] Interface naming (ends with -er)
+- [ ] Error naming (starts with Err)
 
-## Review Categories
+### Error Handling
+- [ ] Errors are checked, not ignored
+- [ ] Errors wrapped with context (`fmt.Errorf("...: %w", err)`)
+- [ ] Sentinel errors used appropriately
+- [ ] Custom error types when needed
 
-### CRITICAL (Must Fix)
-- SQL/Command injection vulnerabilities
-- Race conditions without synchronization
-- Goroutine leaks
-- Hardcoded credentials
-- Unsafe pointer usage
-- Ignored errors in critical paths
+### Concurrency
+- [ ] Goroutines properly managed
+- [ ] Channels buffered appropriately
+- [ ] No data races (use `-race` flag)
+- [ ] Context passed for cancellation
+- [ ] WaitGroups used correctly
 
-### HIGH (Should Fix)
-- Missing error wrapping with context
-- Panic instead of error returns
-- Context not propagated
-- Unbuffered channels causing deadlocks
-- Interface not satisfied errors
-- Missing mutex protection
+### Performance
+- [ ] Avoid unnecessary allocations
+- [ ] Use `sync.Pool` for frequent allocations
+- [ ] Prefer value receivers for small structs
+- [ ] Buffer I/O operations
 
-### MEDIUM (Consider)
-- Non-idiomatic code patterns
-- Missing godoc comments on exports
-- Inefficient string concatenation
-- Slice not preallocated
-- Table-driven tests not used
+### Code Organization
+- [ ] Small, focused packages
+- [ ] Clear dependency direction
+- [ ] Internal packages for private code
+- [ ] Godoc comments on exports
 
-## Automated Checks Run
+## Report Format
 
-```bash
-# Static analysis
-go vet ./...
+### Idiomatic Issues
+- [file:line] Issue description
+  Suggestion: How to fix
 
-# Advanced checks (if installed)
-staticcheck ./...
-golangci-lint run
+### Error Handling Issues
+- [file:line] Issue description
+  Suggestion: How to fix
 
-# Race detection
-go build -race ./...
+### Concurrency Issues
+- [file:line] Issue description
+  Suggestion: How to fix
 
-# Security vulnerabilities
-govulncheck ./...
-```
+### Performance Issues
+- [file:line] Issue description
+  Suggestion: How to fix
 
-## Example Usage
+---
 
-```text
-User: /go-review
-
-Agent:
-# Go Code Review Report
-
-## Files Reviewed
-- internal/handler/user.go (modified)
-- internal/service/auth.go (modified)
-
-## Static Analysis Results
-✓ go vet: No issues
-✓ staticcheck: No issues
-
-## Issues Found
-
-[CRITICAL] Race Condition
-File: internal/service/auth.go:45
-Issue: Shared map accessed without synchronization
-```go
-var cache = map[string]*Session{}  // Concurrent access!
-
-func GetSession(id string) *Session {
-    return cache[id]  // Race condition
-}
-```
-Fix: Use sync.RWMutex or sync.Map
-```go
-var (
-    cache   = map[string]*Session{}
-    cacheMu sync.RWMutex
-)
-
-func GetSession(id string) *Session {
-    cacheMu.RLock()
-    defer cacheMu.RUnlock()
-    return cache[id]
-}
-```
-
-[HIGH] Missing Error Context
-File: internal/handler/user.go:28
-Issue: Error returned without context
-```go
-return err  // No context
-```
-Fix: Wrap with context
-```go
-return fmt.Errorf("get user %s: %w", userID, err)
-```
-
-## Summary
-- CRITICAL: 1
-- HIGH: 1
-- MEDIUM: 0
-
-Recommendation: ❌ Block merge until CRITICAL issue is fixed
-```
-
-## Approval Criteria
-
-| Status | Condition |
-|--------|-----------|
-| ✅ Approve | No CRITICAL or HIGH issues |
-| ⚠️ Warning | Only MEDIUM issues (merge with caution) |
-| ❌ Block | CRITICAL or HIGH issues found |
-
-## Integration with Other Commands
-
-- Use `/go-test` first to ensure tests pass
-- Use `/go-build` if build errors occur
-- Use `/go-review` before committing
-- Use `/code-review` for non-Go specific concerns
-
-## Related
-
-- Agent: `agents/go-reviewer.md`
-- Skills: `skills/golang-patterns/`, `skills/golang-testing/`
+**TIP**: Run `go vet` and `staticcheck` for additional automated checks.

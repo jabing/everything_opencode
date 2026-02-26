@@ -1,91 +1,93 @@
 ---
-name: instinct-export
-description: Export instincts for sharing with teammates or other projects
-command: /instinct-export
+description: Export instincts for sharing
+agent: build
 ---
 
 # Instinct Export Command
 
-Exports instincts to a shareable format. Perfect for:
-- Sharing with teammates
-- Transferring to a new machine
-- Contributing to project conventions
+Export instincts for sharing with others: $ARGUMENTS
 
-## Usage
+## Your Task
 
+Export instincts from the continuous-learning-v2 system.
+
+## Export Options
+
+### Export All
 ```
-/instinct-export                           # Export all personal instincts
-/instinct-export --domain testing          # Export only testing instincts
-/instinct-export --min-confidence 0.7      # Only export high-confidence instincts
-/instinct-export --output team-instincts.yaml
-```
-
-## What to Do
-
-1. Read instincts from `~/.claude/homunculus/instincts/personal/`
-2. Filter based on flags
-3. Strip sensitive information:
-   - Remove session IDs
-   - Remove file paths (keep only patterns)
-   - Remove timestamps older than "last week"
-4. Generate export file
-
-## Output Format
-
-Creates a YAML file:
-
-```yaml
-# Instincts Export
-# Generated: 2025-01-22
-# Source: personal
-# Count: 12 instincts
-
-version: "2.0"
-exported_by: "continuous-learning-v2"
-export_date: "2025-01-22T10:30:00Z"
-
-instincts:
-  - id: prefer-functional-style
-    trigger: "when writing new functions"
-    action: "Use functional patterns over classes"
-    confidence: 0.8
-    domain: code-style
-    observations: 8
-
-  - id: test-first-workflow
-    trigger: "when adding new functionality"
-    action: "Write test first, then implementation"
-    confidence: 0.9
-    domain: testing
-    observations: 12
-
-  - id: grep-before-edit
-    trigger: "when modifying code"
-    action: "Search with Grep, confirm with Read, then Edit"
-    confidence: 0.7
-    domain: workflow
-    observations: 6
+/instinct-export
 ```
 
-## Privacy Considerations
+### Export High Confidence Only
+```
+/instinct-export --min-confidence 0.8
+```
 
-Exports include:
-- ✅ Trigger patterns
-- ✅ Actions
-- ✅ Confidence scores
-- ✅ Domains
-- ✅ Observation counts
+### Export by Category
+```
+/instinct-export --category coding
+```
 
-Exports do NOT include:
-- ❌ Actual code snippets
-- ❌ File paths
-- ❌ Session transcripts
-- ❌ Personal identifiers
+### Export to Specific Path
+```
+/instinct-export --output ./my-instincts.json
+```
 
-## Flags
+## Export Format
 
-- `--domain <name>`: Export only specified domain
-- `--min-confidence <n>`: Minimum confidence threshold (default: 0.3)
-- `--output <file>`: Output file path (default: instincts-export-YYYYMMDD.yaml)
-- `--format <yaml|json|md>`: Output format (default: yaml)
-- `--include-evidence`: Include evidence text (default: excluded)
+```json
+{
+  "instincts": [
+    {
+      "id": "instinct-123",
+      "trigger": "[situation description]",
+      "action": "[recommended action]",
+      "confidence": 0.85,
+      "category": "coding",
+      "applications": 10,
+      "successes": 9,
+      "source": "session-observation"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "exported": "2025-01-15T10:00:00Z",
+    "author": "username",
+    "total": 25,
+    "filter": "confidence >= 0.8"
+  }
+}
+```
+
+## Export Report
+
+```
+Export Summary
+==============
+Output: ./instincts-export.json
+Total instincts: X
+Filtered: Y
+Exported: Z
+
+Categories:
+- coding: N
+- testing: N
+- security: N
+- git: N
+
+Top Instincts (by confidence):
+1. [trigger] (0.XX)
+2. [trigger] (0.XX)
+3. [trigger] (0.XX)
+```
+
+## Sharing
+
+After export:
+- Share JSON file directly
+- Upload to team repository
+- Publish to instinct registry
+
+---
+
+**TIP**: Export high-confidence instincts (>0.8) for better quality shares.

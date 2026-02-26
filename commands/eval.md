@@ -1,120 +1,88 @@
+---
+description: Run evaluation against acceptance criteria
+agent: build
+---
+
 # Eval Command
 
-Manage eval-driven development workflow.
+Evaluate implementation against acceptance criteria: $ARGUMENTS
 
-## Usage
+## Your Task
 
-`/eval [define|check|report|list] [feature-name]`
+Run structured evaluation to verify the implementation meets requirements.
 
-## Define Evals
+## Evaluation Framework
 
-`/eval define feature-name`
+### Grader Types
 
-Create a new eval definition:
+1. **Binary Grader** - Pass/Fail
+   - Does it work? Yes/No
+   - Good for: feature completion, bug fixes
 
-1. Create `.claude/evals/feature-name.md` with template:
+2. **Scalar Grader** - Score 0-100
+   - How well does it work?
+   - Good for: performance, quality metrics
 
-```markdown
-## EVAL: feature-name
-Created: $(date)
+3. **Rubric Grader** - Category scores
+   - Multiple dimensions evaluated
+   - Good for: comprehensive review
 
-### Capability Evals
-- [ ] [Description of capability 1]
-- [ ] [Description of capability 2]
+## Evaluation Process
 
-### Regression Evals
-- [ ] [Existing behavior 1 still works]
-- [ ] [Existing behavior 2 still works]
-
-### Success Criteria
-- pass@3 > 90% for capability evals
-- pass^3 = 100% for regression evals
-```
-
-2. Prompt user to fill in specific criteria
-
-## Check Evals
-
-`/eval check feature-name`
-
-Run evals for a feature:
-
-1. Read eval definition from `.claude/evals/feature-name.md`
-2. For each capability eval:
-   - Attempt to verify criterion
-   - Record PASS/FAIL
-   - Log attempt in `.claude/evals/feature-name.log`
-3. For each regression eval:
-   - Run relevant tests
-   - Compare against baseline
-   - Record PASS/FAIL
-4. Report current status:
+### Step 1: Define Criteria
 
 ```
-EVAL CHECK: feature-name
-========================
-Capability: X/Y passing
-Regression: X/Y passing
-Status: IN PROGRESS / READY
+Acceptance Criteria:
+1. [Criterion 1] - [weight]
+2. [Criterion 2] - [weight]
+3. [Criterion 3] - [weight]
 ```
 
-## Report Evals
+### Step 2: Run Tests
 
-`/eval report feature-name`
+For each criterion:
+- Execute relevant test
+- Collect evidence
+- Score result
 
-Generate comprehensive eval report:
-
-```
-EVAL REPORT: feature-name
-=========================
-Generated: $(date)
-
-CAPABILITY EVALS
-----------------
-[eval-1]: PASS (pass@1)
-[eval-2]: PASS (pass@2) - required retry
-[eval-3]: FAIL - see notes
-
-REGRESSION EVALS
-----------------
-[test-1]: PASS
-[test-2]: PASS
-[test-3]: PASS
-
-METRICS
--------
-Capability pass@1: 67%
-Capability pass@3: 100%
-Regression pass^3: 100%
-
-NOTES
------
-[Any issues, edge cases, or observations]
-
-RECOMMENDATION
---------------
-[SHIP / NEEDS WORK / BLOCKED]
-```
-
-## List Evals
-
-`/eval list`
-
-Show all eval definitions:
+### Step 3: Calculate Score
 
 ```
-EVAL DEFINITIONS
-================
-feature-auth      [3/5 passing] IN PROGRESS
-feature-search    [5/5 passing] READY
-feature-export    [0/4 passing] NOT STARTED
+Final Score = Σ (criterion_score × weight) / total_weight
 ```
 
-## Arguments
+### Step 4: Report
 
-$ARGUMENTS:
-- `define <name>` - Create new eval definition
-- `check <name>` - Run and check evals
-- `report <name>` - Generate full report
-- `list` - Show all evals
-- `clean` - Remove old eval logs (keeps last 10 runs)
+## Evaluation Report
+
+### Overall: [PASS/FAIL] (Score: X/100)
+
+### Criterion Breakdown
+
+| Criterion | Score | Weight | Weighted |
+|-----------|-------|--------|----------|
+| [Criterion 1] | X/10 | 30% | X |
+| [Criterion 2] | X/10 | 40% | X |
+| [Criterion 3] | X/10 | 30% | X |
+
+### Evidence
+
+**Criterion 1: [Name]**
+- Test: [what was tested]
+- Result: [outcome]
+- Evidence: [screenshot, log, output]
+
+### Recommendations
+
+[If not passing, what needs to change]
+
+## Pass@K Metrics
+
+For non-deterministic evaluations:
+- Run K times
+- Calculate pass rate
+- Report: "Pass@K = X/K"
+
+---
+
+**TIP**: Use eval for acceptance testing before marking features complete.
