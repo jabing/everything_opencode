@@ -54,6 +54,19 @@ Smart hooks that run automatically:
 - **Shell Execution** - Build/test result analysis
 - **Session** - Start/end logging and cleanup
 - **Security** - Secret scanning, input validation
+### Prerequisites
+
+First, install OpenCode:
+```bash
+# macOS/Linux
+brew install opencode
+
+# Or via npm
+npm install -g opencode
+
+# Verify installation
+opencode --version
+```
 
 ```bash
 git clone https://github.com/jabing/everything_opencode.git

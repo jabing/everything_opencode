@@ -3,6 +3,19 @@
 This is a **production-ready AI coding plugin** providing 13 specialized agents, 50+ skills, 33 commands, and automated hook workflows for software development.
 ## Installation
 
+### Prerequisites
+First, install OpenCode:
+```bash
+# macOS/Linux
+brew install opencode
+
+# Or via npm
+npm install -g opencode
+
+# Verify installation
+opencode --version
+```
+
 ### Quick Start
 ```bash
 git clone https://github.com/jabing/everything_opencode.git
