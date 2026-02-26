@@ -246,19 +246,21 @@ async function installGlobal() {
     fs.copyFileSync(agentsMdPath, path.join(globalConfigDir, 'AGENTS.md'))
   }
   
-  // Update global opencode.json with correct plugin paths
+  // Copy prompts directory (needed for agent prompts)
+  const promptsDir = path.join(projectDir, '.opencode', 'prompts')
+  if (dirExists(promptsDir)) {
+    logInfo('Copying prompts...')
+    copyDir(promptsDir, path.join(globalConfigDir, '.opencode', 'prompts'))
+  }
+
+  // Update global opencode.json to reference full config
   const config = {
     "$schema": "https://opencode.ai/config.json",
-    "plugin": [path.join(globalConfigDir, '.opencode')],
-    "instructions": [
-      path.join(globalConfigDir, 'AGENTS.md'),
-      path.join(globalConfigDir, 'instructions', 'INSTRUCTIONS.md')
-    ]
+    "plugin": [path.join(globalConfigDir, '.opencode')]
   }
 
   writeJson(globalConfigPath, config)
   logSuccess('Updated global opencode.json')
-  
   logSuccess('\nGlobal installation complete!')
   logInfo('EOC is now available in ALL your projects.')
   logInfo(`Global config location: ${globalConfigDir}`)
