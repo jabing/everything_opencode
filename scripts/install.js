@@ -225,10 +225,8 @@ async function installGlobal() {
   // Copy directories to global config location
   logInfo('Copying OpenCode configuration...')
   copyDir(pluginsDir, path.join(globalConfigDir, '.opencode'))
-  
   logInfo('Copying agents...')
   copyDir(agentsDir, path.join(globalConfigDir, 'agents'))
-  
   logInfo('Copying skills...')
   copyDir(skillsDir, path.join(globalConfigDir, 'skills'))
   
