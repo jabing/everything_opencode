@@ -34,8 +34,8 @@
       }
     },
     "planner": {
-      "description": "Expert planning specialist for complex features and refactoring. Use for implementation planning, architectural changes, or complex refactoring.",
-      "mode": "subagent",
+      "description": "Expert planning specialist for complex features and refactoring",
+      "mode": "primary",
       "model": "zhipuai-coding-plan/glm-5",
       "prompt": "{file:./prompts/agents/planner.txt}",
       "tools": {
@@ -45,21 +45,9 @@
         "edit": false
       }
     },
-    "architect": {
-      "description": "Software architecture specialist for system design, scalability, and technical decision-making.",
-      "mode": "subagent",
-      "model": "zhipuai-coding-plan/glm-5",
-      "prompt": "{file:./prompts/agents/architect.txt}",
-      "tools": {
-        "read": true,
-        "bash": true,
-        "write": false,
-        "edit": false
-      }
-    },
     "code-reviewer": {
-      "description": "Expert code review specialist. Reviews code for quality, security, and maintainability. Use immediately after writing or modifying code.",
-      "mode": "subagent",
+      "description": "Expert code review specialist",
+      "mode": "primary",
       "model": "zhipuai-coding-plan/glm-5",
       "prompt": "{file:./prompts/agents/code-reviewer.txt}",
       "tools": {
@@ -67,114 +55,6 @@
         "bash": true,
         "write": false,
         "edit": false
-      }
-    },
-    "security-reviewer": {
-      "description": "Security vulnerability detection and remediation specialist. Use after writing code that handles user input, authentication, API endpoints, or sensitive data.",
-      "mode": "subagent",
-      "model": "zhipuai-coding-plan/glm-5",
-      "prompt": "{file:./prompts/agents/security-reviewer.txt}",
-      "tools": {
-        "read": true,
-        "bash": true,
-        "write": true,
-        "edit": true
-      }
-    },
-    "tdd-guide": {
-      "description": "Test-Driven Development specialist enforcing write-tests-first methodology. Use when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage.",
-      "mode": "subagent",
-      "model": "zhipuai-coding-plan/glm-5",
-      "prompt": "{file:./prompts/agents/tdd-guide.txt}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
-    },
-    "build-error-resolver": {
-      "description": "Build and TypeScript error resolution specialist. Use when build fails or type errors occur. Fixes build/type errors only with minimal diffs.",
-      "mode": "subagent",
-      "model": "zhipuai-coding-plan/glm-5",
-      "prompt": "{file:./prompts/agents/build-error-resolver.txt}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
-    },
-    "e2e-runner": {
-      "description": "End-to-end testing specialist using Playwright. Generates, maintains, and runs E2E tests for critical user flows.",
-      "mode": "subagent",
-      "model": "zhipuai-coding-plan/glm-5",
-      "prompt": "{file:./prompts/agents/e2e-runner.txt}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
-    },
-    "doc-updater": {
-      "description": "Documentation and codemap specialist. Use for updating codemaps and documentation.",
-      "mode": "subagent",
-      "model": "zhipuai-coding-plan/glm-5",
-      "prompt": "{file:./prompts/agents/doc-updater.txt}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
-    },
-    "refactor-cleaner": {
-      "description": "Dead code cleanup and consolidation specialist. Use for removing unused code, duplicates, and refactoring.",
-      "mode": "subagent",
-      "model": "zhipuai-coding-plan/glm-5",
-      "prompt": "{file:./prompts/agents/refactor-cleaner.txt}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
-    },
-    "go-reviewer": {
-      "description": "Expert Go code reviewer specializing in idiomatic Go, concurrency patterns, error handling, and performance.",
-      "mode": "subagent",
-      "model": "zhipuai-coding-plan/glm-5",
-      "prompt": "{file:./prompts/agents/go-reviewer.txt}",
-      "tools": {
-        "read": true,
-        "bash": true,
-        "write": false,
-        "edit": false
-      }
-    },
-    "go-build-resolver": {
-      "description": "Go build, vet, and compilation error resolution specialist. Fixes Go build errors with minimal changes.",
-      "mode": "subagent",
-      "model": "zhipuai-coding-plan/glm-5",
-      "prompt": "{file:./prompts/agents/go-build-resolver.txt}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
-    },
-    "database-reviewer": {
-      "description": "PostgreSQL database specialist for query optimization, schema design, security, and performance. Incorporates Supabase best practices.",
-      "mode": "subagent",
-      "model": "zhipuai-coding-plan/glm-5",
-      "prompt": "{file:./prompts/agents/database-reviewer.txt}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true
       }
     }
   },
