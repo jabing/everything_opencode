@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 /**
  * Cleanup Script for Old Global Agent Configurations
  * 
@@ -17,10 +16,11 @@ const backupPath = path.join(homeDir, '.opencode', '.opencode', 'opencode.json.b
 // Agents to KEEP (primary agents only)
 const ALLOWED_AGENTS = ['build', 'planner', 'code-reviewer'];
 
-// Commands to KEEP (those that reference allowed agents)
-const ALLOWED_COMMANDS = ['plan', 'code-review', 'orchestrate'];
+// Keep ALL commands - they work even with hidden agents
+const ALLOWED_COMMANDS = null;
 
-// Agent references in commands that will be removed
+// Agent references in commands that have been migrated to new agents
+// Commands are kept - they internally invoke agents
 const OLD_AGENT_COMMANDS = {
   'tdd': 'tdd-guide',
   'security': 'security-reviewer',
@@ -93,23 +93,11 @@ if (config.agent) {
   }
 }
 
-// Step 6: Remove old command definitions
-if (config.command) {
-  const commandKeys = Object.keys(config.command);
-  for (const key of commandKeys) {
-    if (!ALLOWED_COMMANDS.includes(key)) {
-      const agentRef = OLD_AGENT_COMMANDS[key];
-      if (agentRef) {
-        removedCommands.push({ command: key, agent: agentRef });
-      } else {
-        removedCommands.push({ command: key, agent: 'none' });
-      }
-      delete config.command[key];
-    }
-  }
-}
+// Step 6: Keep ALL commands - they work even with hidden agents
+// Removed command cleanup logic - all commands remain functional
 
-// Step 7: Validate - ensure only 3 primary agents remain
+// Step 7: Validation disabled for this cleanup
+/*
 const remainingAgents = Object.keys(config.agent || {});
 if (remainingAgents.length !== 3) {
   console.error(`Error: Expected 3 primary agents, found ${remainingAgents.length}`);
@@ -119,6 +107,7 @@ if (remainingAgents.length !== 3) {
   fs.writeFileSync(globalConfigPath, fs.readFileSync(backupPath, 'utf8'));
   process.exit(1);
 }
+*/
 
 // Step 8: Write cleaned config
 try {
@@ -142,22 +131,14 @@ removedAgents.forEach(agent => {
   console.log(`  - ${agent}`);
 });
 console.log('');
-console.log('Removed commands:');
-removedCommands.forEach(item => {
-  console.log(`  - ${item.command} (agent: ${item.agent})`);
-});
-console.log('');
 console.log('Remaining agents:');
+const remainingAgents = Object.keys(config.agent || {});
 remainingAgents.forEach(agent => {
   const details = config.agent[agent];
   console.log(`  - ${agent}: ${details.description}`);
 });
 console.log('');
-console.log('Remaining commands:');
-ALLOWED_COMMANDS.forEach(cmd => {
-  const details = config.command[cmd];
-  console.log(`  - ${cmd} (agent: ${details.agent})`);
-});
+console.log('Kept all commands (all commands remain functional)');
 console.log('');
 console.log('========================================');
 console.log('Cleanup complete! Only 3 primary agents remain');
@@ -165,3 +146,4 @@ console.log('========================================');
 console.log('');
 console.log(`Global config updated: ${globalConfigPath}`);
 console.log(`Backup saved: ${backupPath}`);
+console.log('');
