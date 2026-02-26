@@ -1,7 +1,7 @@
 # Everything OpenCode Plugin
 
 > ⚠️ This README is specific to OpenCode usage.  
-> If you installed ECC via npm (e.g. `npm install everything-opencode`), refer to the root README instead.
+> If you installed EOC via npm (e.g. `npm install everything-opencode`), refer to the root README instead.
 
 Everything OpenCode plugin for OpenCode - agents, commands, hooks, and skills.
 
@@ -22,14 +22,14 @@ Choose the method that matches your workflow below.
 ### Option 1: npm Package
 
 ```bash
-npm install ecc-universal
+npm install eoc-universal
 ```
 
 Add to your `opencode.json`:
 
 ```json
 {
-  "plugin": ["ecc-universal"]
+  "plugin": ["eoc-universal"]
 }
 ```
 After installation, the `everything-opencode` CLI becomes available:
@@ -130,7 +130,7 @@ OpenCode has 20+ additional events not available in Claude Code.
 
 ## Skills
 
-All 16 ECC skills are available via the `instructions` array:
+All 16 EOC skills are available via the `instructions` array:
 
 - coding-standards
 - backend-patterns

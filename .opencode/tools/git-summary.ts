@@ -1,5 +1,5 @@
 /**
- * ECC Custom Tool: Git Summary
+ * EOC Custom Tool: Git Summary
  *
  * Provides a comprehensive git status including branch info, status,
  * recent log, and diff against base branch.

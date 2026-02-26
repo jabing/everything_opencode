@@ -1,5 +1,5 @@
 /**
- * Everything Claude Code (ECC) Plugin for OpenCode
+ * Everything Claude Code (EOC) Plugin for OpenCode
  *
  * This package provides a complete OpenCode plugin with:
  * - 13 specialized agents (planner, architect, code-reviewer, etc.)
@@ -12,13 +12,13 @@
  *
  * Option 1: Install via npm
  * ```bash
- * npm install ecc-universal
+ * npm install eoc-universal
  * ```
  *
  * Then add to your opencode.json:
  * ```json
  * {
- *   "plugin": ["ecc-universal"]
+ *   "plugin": ["eoc-universal"]
  * }
  * ```
  *
@@ -33,7 +33,7 @@
  */
 
 // Export the main plugin
-export { ECCHooksPlugin, default } from "./plugins/index.js"
+export { EOCHooksPlugin, default } from "./plugins/index.js"
 
 // Export individual components for selective use
 export * from "./plugins/index.js"
@@ -43,7 +43,7 @@ export const VERSION = "1.6.0"
 
 // Plugin metadata
 export const metadata = {
-  name: "ecc-universal",
+  name: "eoc-universal",
   version: VERSION,
   description: "Everything Claude Code plugin for OpenCode",
   author: "affaan-m",

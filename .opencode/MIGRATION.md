@@ -1,6 +1,6 @@
 # Migration Guide: Claude Code to OpenCode
 
-This guide helps you migrate from Claude Code to OpenCode while using the Everything Claude Code (ECC) configuration.
+This guide helps you migrate from Claude Code to OpenCode while using the Everything Claude Code (EOC) configuration.
 
 ## Overview
 
@@ -65,9 +65,9 @@ export const PrettierPlugin = async ({ $ }) => {
 }
 ```
 
-### ECC Plugin Hooks Included
+### EOC Plugin Hooks Included
 
-The ECC OpenCode configuration includes translated hooks:
+The EOC OpenCode configuration includes translated hooks:
 
 | Hook | OpenCode Event | Purpose |
 |------|----------------|---------|
@@ -88,7 +88,7 @@ npm install -g opencode
 curl -fsSL https://opencode.ai/install | bash
 ```
 
-### 2. Use the ECC OpenCode Configuration
+### 2. Use the EOC OpenCode Configuration
 
 The `.opencode/` directory in this repository contains the translated configuration:
 
@@ -96,7 +96,7 @@ The `.opencode/` directory in this repository contains the translated configurat
 .opencode/
 ├── opencode.json              # Main configuration
 ├── plugins/                   # Hook plugins (translated from hooks.json)
-│   ├── ecc-hooks.ts           # All ECC hooks as plugins
+│   ├── eoc-hooks.ts           # All EOC hooks as plugins
 │   └── index.ts               # Plugin exports
 ├── tools/                     # Custom tools
 │   ├── run-tests.ts           # Run test suite
@@ -278,20 +278,20 @@ After migration, ALL 23 commands are available:
 
 ## Plugin Installation
 
-### Option 1: Use ECC Configuration Directly
+### Option 1: Use EOC Configuration Directly
 
 The `.opencode/` directory contains everything pre-configured.
 
 ### Option 2: Install as npm Package
 
 ```bash
-npm install ecc-universal
+npm install eoc-universal
 ```
 
 Then in your `opencode.json`:
 ```json
 {
-  "plugin": ["ecc-universal"]
+  "plugin": ["eoc-universal"]
 }
 ```
 
@@ -353,4 +353,4 @@ If you need to switch back:
 
 For issues specific to:
 - **OpenCode CLI**: Report to OpenCode's issue tracker
-- **ECC Configuration**: Report to [github.com/affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code)
+- **EOC Configuration**: Report to [github.com/affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code)

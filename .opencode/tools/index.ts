@@ -1,5 +1,5 @@
 /**
- * ECC Custom Tools for OpenCode
+ * EOC Custom Tools for OpenCode
  *
  * These tools extend OpenCode with additional capabilities.
  */

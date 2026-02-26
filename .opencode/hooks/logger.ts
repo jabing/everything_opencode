@@ -1,10 +1,10 @@
 /**
- * ECC Logger - Redirects all hook output to log file instead of TUI
+ * EOC Logger - Redirects all hook output to log file instead of TUI
  * 
  * This prevents TUI corruption by writing all output to a dedicated log file
  * instead of stdout/stderr which can interfere with terminal displays.
  * 
- * Log file location: .opencode/ecc.log (relative to project root)
+ * Log file location: .opencode/eoc.log (relative to project root)
  */
 
 import * as fs from 'fs';
@@ -12,7 +12,7 @@ import * as path from 'path';
 
 // Log file path - relative to project root
 const LOG_DIR = '.opencode';
-const LOG_FILE = 'ecc.log';
+const LOG_FILE = 'eoc.log';
 
 /**
  * Get the log file path, creating directory if needed
@@ -40,7 +40,7 @@ function getLogPath(): string {
       fs.mkdirSync(logDir, { recursive: true });
     } catch {
       // Can't create dir, use temp
-      return path.join(process.env.TEMP || '/tmp', 'ecc.log');
+      return path.join(process.env.TEMP || '/tmp', 'eoc.log');
     }
   }
   

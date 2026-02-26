@@ -1,5 +1,5 @@
 /**
- * ECC Custom Tool: Format Code
+ * EOC Custom Tool: Format Code
  *
  * Language-aware code formatter that auto-detects the project's formatter.
  * Supports: Biome/Prettier (JS/TS), Black (Python), gofmt (Go), rustfmt (Rust)
