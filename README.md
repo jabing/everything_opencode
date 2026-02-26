@@ -78,15 +78,7 @@ Choose either:
 1. **Project-level** - Installs to `.opencode/` in current directory
 2. **Global** - Installs to OpenCode's global config directory
 
-### As Plugin
 
-Add to your `opencode.json`:
-
-```json
-{
-  "plugin": ["./.opencode/plugins"]
-}
-```
 
 
 ## Project Structure
