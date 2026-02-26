@@ -224,6 +224,8 @@ async function installGlobal() {
   
   // Copy directories to global config location
   logInfo('Copying OpenCode configuration...')
+  copyDir(pluginsDir, path.join(globalConfigDir, '.opencode'))
+  
   
   // Copy instructions directory separately to avoid nesting
   const instructionsDir = path.join(projectDir, '.opencode', 'instructions')
