@@ -8,6 +8,7 @@
 import { tool } from "@opencode-ai/plugin/tool"
 import * as path from "path"
 import * as fs from "fs"
+import { execSync } from "child_process"
 
 export default tool({
   description:
@@ -97,20 +98,63 @@ export default tool({
   },
 })
 
-async function detectPackageManager(cwd: string): Promise<string> {
-  const lockFiles: Record<string, string> = {
-    "bun.lockb": "bun",
-    "pnpm-lock.yaml": "pnpm",
-    "yarn.lock": "yarn",
-    "package-lock.json": "npm",
+/**
+ * Check if a command/binary is available on the system.
+ * Cross-platform: uses Node.js stdio handling to avoid shell redirect issues
+ * on Windows + Git Bash where `2>nul` creates an actual file.
+ */
+function isCommandAvailable(command: string): boolean {
+  try {
+    const checkCmd = process.platform === "win32" ? "where" : "which"
+    execSync(`${checkCmd} ${command}`, {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "ignore"],  // stdin, stdout, stderr (ignore)
+      windowsHide: true,
+    })
+    return true
+  } catch {
+    return false
   }
+}
 
-  for (const [lockFile, pm] of Object.entries(lockFiles)) {
-    if (fs.existsSync(path.join(cwd, lockFile))) {
-      return pm
+/**
+ * Detect package manager from lock files and environment
+ * Priority:
+ * 1. CLAUDE_PACKAGE_MANAGER env var (if valid and available)
+ * 2. Lock file detection (must be available on system)
+ * 3. Fallback to npm (always available with Node.js)
+ */
+async function detectPackageManager(cwd: string): Promise<string> {
+  // Check environment variable first
+  const envPm = process.env.CLAUDE_PACKAGE_MANAGER
+  if (envPm && ["npm", "pnpm", "yarn", "bun"].includes(envPm)) {
+    if (envPm === "npm" || isCommandAvailable(envPm)) {
+      return envPm
     }
   }
 
+  // Lock file to package manager mapping (ordered by preference)
+  // Note: bun.lock is the new text-based format (bun 1.0+), bun.lockb is legacy binary format
+  const lockFileMappings: Array<{ file: string; pm: string }> = [
+    { file: "package-lock.json", pm: "npm" },    // npm - most common, always available
+    { file: "pnpm-lock.yaml", pm: "pnpm" },
+    { file: "yarn.lock", pm: "yarn" },
+    { file: "bun.lock", pm: "bun" },           // bun 1.0+ (text format)
+    { file: "bun.lockb", pm: "bun" },          // bun < 1.0 (binary format)
+  ]
+
+  // Check lock files in order
+  for (const { file, pm } of lockFileMappings) {
+    if (fs.existsSync(path.join(cwd, file))) {
+      // Verify the package manager is actually available on this system
+      if (pm === "npm" || isCommandAvailable(pm)) {
+        return pm
+      }
+      // Package manager not available, continue to next option
+    }
+  }
+
+  // Fallback to npm (always available with Node.js)
   return "npm"
 }
 

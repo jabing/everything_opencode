@@ -1,17 +1,22 @@
 /**
  * OpenCode Hook: Session Start
  * Triggered when: session.created
+ * 
+ * All output redirected to log file to prevent TUI corruption
  */
 
-import { HookContext } from '.opencode/types';
+import logger from './logger';
 
-export async function sessionStart(context: HookContext) {
-  // Log session start for tracking
+export async function sessionStart(context: { sessionId?: string }) {
   const sessionId = context.sessionId;
   const startTime = new Date().toISOString();
   
-  // You can add additional logging here
-  console.log(`[Session Started] ID: ${sessionId}, Time: ${startTime}`);
+  // Log to file instead of console
+  logger.info(`Session started: ${sessionId} at ${startTime}`);
   
-  return context;
+  return {
+    ...context,
+    sessionStartTime: startTime,
+    sessionStatus: 'started',
+  };
 }

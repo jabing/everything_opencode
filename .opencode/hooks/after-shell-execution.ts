@@ -1,31 +1,31 @@
 /**
  * OpenCode Hook: Shell Execution (After)
  * Triggered when: tool.execute.after
+ * 
+ * All output redirected to log file to prevent TUI corruption
  */
 
-import { HookContext } from '.opencode/types';
-import { execSync } from 'child_process';
+import logger from './logger';
 
-export async function afterShellExecution(context: HookContext) {
+export async function afterShellExecution(context: { command?: string; exitCode?: number }) {
   const command = context.command || '';
   const exitCode = context.exitCode;
   
-  // Build analysis
+  // Build analysis - log to file
   if (command.includes('build') || command.includes('tsc')) {
     if (exitCode !== 0) {
-      console.error(`[Build Failed] Exit code: ${exitCode}, Command: ${command}`);
-      console.error('[Suggestion] Check error messages above and fix issues');
+      logger.error(`Build failed (exit ${exitCode}): ${command.substring(0, 100)}`);
     } else {
-      console.log(`[Build Success] Command: ${command}`);
+      logger.info(`Build success`);
     }
   }
   
-  // Test execution
+  // Test execution - log to file
   if (command.includes('test') || command.includes('jest')) {
     if (exitCode !== 0) {
-      console.error(`[Tests Failed] Exit code: ${exitCode}`);
+      logger.error(`Tests failed (exit ${exitCode})`);
     } else {
-      console.log(`[Tests Passed] All tests passed successfully`);
+      logger.info(`Tests passed`);
     }
   }
   

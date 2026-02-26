@@ -1,22 +1,30 @@
 /**
  * OpenCode Hook: Shell Execution (Before)
  * Triggered when: tool.execute.before
+ * 
+ * All output redirected to log file to prevent TUI corruption
  */
 
-import { HookContext } from '.opencode/types';
 import { spawnSync } from 'child_process';
+import logger from './logger';
 
-export async function beforeShellExecution(context: HookContext) {
+export async function beforeShellExecution(context: { command?: string }) {
   const command = context.command || '';
   
-  // Tmux dev server blocker
+  // Tmux dev server check - log to file
   if (command.includes('dev server') || command.includes('next dev') || command.includes('vite dev')) {
-    const hasTmux = spawnSync('tmux', ['-L'], { stdio: 'pipe' });
-    const hasTmuxOutput = hasTmux.stdout?.toString();
-    
-    if (hasTmuxOutput && !hasTmuxOutput.includes('no server')) {
-      console.warn('[Tmux Reminder] dev server detected but tmux session not active. Consider starting: tmux new -s dev');
-      console.warn('[Suggested Command] tmux new -s dev -n node');
+    try {
+      const hasTmux = spawnSync('tmux', ['-L'], { 
+        stdio: ['pipe', 'pipe', 'pipe'],
+        windowsHide: true,
+      });
+      const hasTmuxOutput = hasTmux.stdout?.toString();
+      
+      if (hasTmuxOutput && !hasTmuxOutput.includes('no server')) {
+        logger.info(`Tmux reminder: consider 'tmux new -s dev -n node'`);
+      }
+    } catch {
+      // tmux not available - ignore
     }
   }
   

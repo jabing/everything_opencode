@@ -26,7 +26,8 @@ export const ECCHooksPlugin = async ({
 
   // Helper to call the SDK's log API with correct signature
   const log = (level: "debug" | "info" | "warn" | "error", message: string) =>
-    client.app.log({ body: { service: "ecc", level, message } })
+    (() => { try { const fs = require("fs"); const p = require("path"); const lp = p.join(process.cwd(), ".opencode", "ecc.log"); const d = p.dirname(lp); if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); fs.appendFileSync(lp, `[${new Date().toISOString().slice(0,19)}] [${level.toUpperCase().padEnd(5)}] ${message}
+`); } catch {} })()
 
   return {
     /**

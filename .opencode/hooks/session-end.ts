@@ -1,18 +1,21 @@
 /**
  * OpenCode Hook: Session End
  * Triggered when: session.deleted
+ * 
+ * All output redirected to log file to prevent TUI corruption
  */
 
-import { HookContext } from '.opencode/types';
+import logger from './logger';
 
-export async function sessionEnd(context: HookContext) {
-  const sessionId = context.sessionId;
+export async function sessionEnd(context: { sessionId?: string }) {
   const endTime = new Date().toISOString();
   
-  console.log(`[Session Ended] ID: ${sessionId}, Time: ${endTime}`);
+  // Log to file instead of console
+  logger.info(`Session ended at ${endTime}`);
   
-  // Cleanup operations can be added here
-  // e.g., close database connections, save final state
-  
-  return context;
+  return {
+    ...context,
+    sessionEndTime: endTime,
+    sessionStatus: 'ended',
+  };
 }
