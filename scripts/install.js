@@ -250,15 +250,34 @@ async function installGlobal() {
   const promptsDir = path.join(projectDir, '.opencode', 'prompts')
   if (dirExists(promptsDir)) {
     logInfo('Copying prompts...')
-    copyDir(promptsDir, path.join(globalConfigDir, '.opencode', 'prompts'))
+    copyDir(promptsDir, path.join(globalConfigDir, 'prompts'))
   }
 
-  // Update global opencode.json to reference full config
+  // Update global opencode.json with agent definitions
   const config = {
-    "$schema": "https://opencode.ai/config.json",
-    "plugin": [path.join(globalConfigDir, '.opencode')]
+    $schema: 'https://opencode.ai/config.json',
+    default_agent: 'eoc_build',
+    agent: {
+      eoc_build: {
+        description: 'EOC - Primary coding agent for development work',
+        mode: 'primary',
+        tools: { write: true, edit: true, bash: true, read: true }
+      },
+      'eoc_planner': {
+        description: 'EOC - Expert planning specialist for complex features',
+        mode: 'primary',
+        prompt: '{file:prompts/agents/planner.txt}',
+        tools: { read: true, bash: true, write: false, edit: false }
+      },
+      'eoc_code-reviewer': {
+        description: 'EOC - Expert code review specialist',
+        mode: 'primary',
+        prompt: '{file:prompts/agents/code-reviewer.txt}',
+        tools: { read: true, bash: true, write: false, edit: false }
+      }
+    },
+    plugin: ['.opencode']
   }
-
   writeJson(globalConfigPath, config)
   logSuccess('Updated global opencode.json')
   logSuccess('\nGlobal installation complete!')
