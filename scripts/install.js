@@ -243,13 +243,13 @@ async function installGlobal() {
   // Update global opencode.json with correct plugin paths
   const config = {
     "$schema": "https://opencode.ai/config.json",
-    "plugin": [globalConfigDir],
+    "plugin": [path.join(globalConfigDir, '.opencode')],
     "instructions": [
       path.join(globalConfigDir, 'AGENTS.md'),
-      path.join(globalConfigDir, 'instructions', 'INSTRUCTIONS.md')
+      path.join(globalConfigDir, '.opencode', 'instructions', 'INSTRUCTIONS.md')
     ]
   }
-  
+
   writeJson(globalConfigPath, config)
   logSuccess('Updated global opencode.json')
   
