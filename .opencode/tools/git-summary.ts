@@ -7,19 +7,7 @@
 
 import { tool } from "@opencode-ai/plugin"
 import { z } from "zod"
-
-/**
- * Validates a git branch name to prevent command injection.
- * Git branch names should only contain alphanumeric, dash, underscore, dot, and slash.
- */
-function validateBranchName(branch: string): string {
-  // Git branch name pattern: alphanumeric, dash, underscore, dot, slash
-  const validPattern = /^[a-zA-Z0-9_\-./]+$/
-  if (!validPattern.test(branch)) {
-    throw new Error(`Invalid branch name: contains invalid characters`)
-  }
-  return branch
-}
+import { validateBranchName } from "../lib/validation"
 
 export default tool({
   name: "git-summary",

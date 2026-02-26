@@ -8,20 +8,8 @@
 import { tool } from "@opencode-ai/plugin"
 import { z } from "zod"
 import { spawnSync } from "child_process"
-
-/**
- * Validates a target path to prevent command injection.
- * Uses allowlist approach - only safe characters permitted.
- */
-function validateTarget(path: string): string {
-  // Allowlist: only alphanumeric, dash, underscore, dot, forward slash, backslash
-  // Also allow space for paths like "my directory/"
-  const safePattern = /^[a-zA-Z0-9_\-./\\ ]+$/
-  if (!safePattern.test(path)) {
-    throw new Error(`Invalid target path: contains unsafe characters`)
-  }
-  return path
-}
+import * as fs from "fs"
+import { validatePath } from "../lib/validation"
 
 export default tool({
   name: "lint-check",
@@ -31,38 +19,49 @@ export default tool({
     fix: z.boolean().optional().describe("Auto-fix issues if supported (default: false)"),
     linter: z.string().optional().describe("Override linter: eslint, biome, ruff, pylint, golangci-lint (default: auto-detect)"),
   }),
-  execute: async ({ target = ".", fix = false, linter }, { $ }) => {
+  execute: async ({ target = ".", fix = false, linter }) => {
     // Validate target path for security
     try {
-      validateTarget(target)
+      validatePath(target)
     } catch (error) {
       return { success: false, error: (error as Error).message }
     }
 
-    // Auto-detect linter
+    // Auto-detect linter using cross-platform fs.existsSync
     let detected = linter
     if (!detected) {
-      try {
-        await $`test -f biome.json || test -f biome.jsonc`
+      // Check for Biome config
+      if (fs.existsSync('biome.json') || fs.existsSync('biome.jsonc')) {
         detected = "biome"
-      } catch {
+      }
+      // Check for ESLint config
+      else if (
+        fs.existsSync('.eslintrc.json') ||
+        fs.existsSync('.eslintrc.js') ||
+        fs.existsSync('.eslintrc.cjs') ||
+        fs.existsSync('eslint.config.js') ||
+        fs.existsSync('eslint.config.mjs')
+      ) {
+        detected = "eslint"
+      }
+      // Check for Ruff in pyproject.toml
+      else if (fs.existsSync('pyproject.toml')) {
         try {
-          await $`test -f .eslintrc.json || test -f .eslintrc.js || test -f .eslintrc.cjs || test -f eslint.config.js || test -f eslint.config.mjs`
-          detected = "eslint"
-        } catch {
-          try {
-            await $`test -f pyproject.toml && grep -q "ruff" pyproject.toml`
+          const content = fs.readFileSync('pyproject.toml', 'utf-8')
+          if (content.includes('ruff')) {
             detected = "ruff"
-          } catch {
-            try {
-              await $`test -f .golangci.yml || test -f .golangci.yaml`
-              detected = "golangci-lint"
-            } catch {
-              // Fall back based on file extensions in target
-              detected = "eslint"
-            }
           }
+        } catch {
+          // Ignore read errors
         }
+      }
+      // Check for golangci-lint config
+      else if (fs.existsSync('.golangci.yml') || fs.existsSync('.golangci.yaml')) {
+        detected = "golangci-lint"
+      }
+      // Fall back to eslint
+      else {
+        detected = "eslint"
       }
     }
 

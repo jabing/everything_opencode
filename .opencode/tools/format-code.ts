@@ -8,19 +8,8 @@
 import { tool } from "@opencode-ai/plugin"
 import { z } from "zod"
 import { spawnSync } from "child_process"
-
-/**
- * Validates a file path to prevent command injection.
- * Uses allowlist approach - only safe characters permitted.
- */
-function validatePath(path: string): string {
-  // Allowlist: only alphanumeric, dash, underscore, dot, forward slash, backslash
-  const safePattern = /^[a-zA-Z0-9_\-./\\]+$/
-  if (!safePattern.test(path)) {
-    throw new Error(`Invalid file path: contains unsafe characters`)
-  }
-  return path
-}
+import * as fs from "fs"
+import { validatePath } from "../lib/validation"
 
 export default tool({
   name: "format-code",
@@ -29,7 +18,7 @@ export default tool({
     filePath: z.string().describe("Path to the file to format"),
     formatter: z.string().optional().describe("Override formatter: biome, prettier, black, gofmt, rustfmt (default: auto-detect)"),
   }),
-  execute: async ({ filePath, formatter }, { $ }) => {
+  execute: async ({ filePath, formatter }) => {
     const ext = filePath.split(".").pop()?.toLowerCase() || ""
 
     // Validate file path for security
@@ -44,10 +33,9 @@ export default tool({
     if (!detected) {
       if (["ts", "tsx", "js", "jsx", "json", "css", "scss"].includes(ext)) {
         // Check for Biome first, then Prettier
-        try {
-          await $`test -f biome.json || test -f biome.jsonc`
+        if (fs.existsSync("biome.json") || fs.existsSync("biome.jsonc")) {
           detected = "biome"
-        } catch {
+        } else {
           detected = "prettier"
         }
       } else if (["py", "pyi"].includes(ext)) {

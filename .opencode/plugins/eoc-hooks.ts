@@ -14,6 +14,9 @@
  */
 
 import type { PluginInput } from "@opencode-ai/plugin"
+import { spawnSync } from "child_process"
+import * as fs from "fs"
+import * as path from "path"
 
 export const EOCHooksPlugin = async ({
   client,
@@ -25,9 +28,70 @@ export const EOCHooksPlugin = async ({
   const editedFiles = new Set<string>()
 
   // Helper to call the SDK's log API with correct signature
-  const log = (level: "debug" | "info" | "warn" | "error", message: string) =>
-    (() => { try { const fs = require("fs"); const p = require("path"); const lp = p.join(process.cwd(), ".opencode", "eoc.log"); const d = p.dirname(lp); if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); fs.appendFileSync(lp, `[${new Date().toISOString().slice(0,19)}] [${level.toUpperCase().padEnd(5)}] ${message}
-`); } catch {} })()
+  const log = (level: "debug" | "info" | "warn" | "error", message: string) => {
+    try {
+      const logPath = path.join(process.cwd(), ".opencode", "eoc.log")
+      const logDir = path.dirname(logPath)
+      if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true })
+      fs.appendFileSync(logPath, `[${new Date().toISOString().slice(0, 19)}] [${level.toUpperCase().padEnd(5)}] ${message}\n`)
+    } catch {}
+  }
+
+  /**
+   * Cross-platform helper to find console.log occurrences in a file.
+   * Replaces `grep -n "console\.log"` which doesn't work on Windows.
+   */
+  const findConsoleLogs = (filePath: string): { line: number; content: string }[] => {
+    try {
+      const content = fs.readFileSync(filePath, "utf-8")
+      const lines = content.split("\n")
+      const results: { line: number; content: string }[] = []
+      
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes("console.log")) {
+          results.push({ line: i + 1, content: lines[i].trim() })
+        }
+      }
+      return results
+    } catch {
+      return []
+    }
+  }
+
+  /**
+   * Cross-platform helper to count console.log occurrences.
+   * Replaces `grep -c "console\.log"` which doesn't work on Windows.
+   */
+  const countConsoleLogs = (filePath: string): number => {
+    return findConsoleLogs(filePath).length
+  }
+
+  /**
+   * Cross-platform helper to run a command and capture output.
+   * Prevents TUI corruption by capturing all stdout/stderr.
+   */
+  const runCommand = (cmd: string, args: string[]): { success: boolean; stdout: string; stderr: string } => {
+    try {
+      const result = spawnSync(cmd, args, {
+        cwd: process.cwd(),
+        stdio: 'pipe',  // Capture all output to prevent TUI corruption
+        shell: false,
+        windowsHide: true,
+      })
+      
+      return {
+        success: result.status === 0,
+        stdout: result.stdout?.toString() || '',
+        stderr: result.stderr?.toString() || '',
+      }
+    } catch (error) {
+      return {
+        success: false,
+        stdout: '',
+        stderr: (error as Error).message,
+      }
+    }
+  }
 
   return {
     /**
@@ -41,29 +105,23 @@ export const EOCHooksPlugin = async ({
       // Track edited files for console.log audit
       editedFiles.add(event.path)
 
-      // Auto-format JS/TS files
+      // Auto-format JS/TS files using cross-platform runCommand
       if (event.path.match(/\.(ts|tsx|js|jsx)$/)) {
-        try {
-          await $`prettier --write ${event.path} 2>/dev/null`
+        const result = runCommand("npx", ["prettier", "--write", event.path])
+        if (result.success) {
           log("info", `[EOC] Formatted: ${event.path}`)
-        } catch {
-          // Prettier not installed or failed - silently continue
         }
+        // Silently continue if prettier fails
       }
 
-      // Console.log warning check
+      // Console.log warning check using cross-platform file reading
       if (event.path.match(/\.(ts|tsx|js|jsx)$/)) {
-        try {
-          const result = await $`grep -n "console\\.log" ${event.path} 2>/dev/null`.text()
-          if (result.trim()) {
-            const lines = result.trim().split("\n").length
-            log(
-              "warn",
-              `[EOC] console.log found in ${event.path} (${lines} occurrence${lines > 1 ? "s" : ""})`
-            )
-          }
-        } catch {
-          // No console.log found (grep returns non-zero) - this is good
+        const consoleLogs = findConsoleLogs(event.path)
+        if (consoleLogs.length > 0) {
+          log(
+            "warn",
+            `[EOC] console.log found in ${event.path} (${consoleLogs.length} occurrence${consoleLogs.length > 1 ? "s" : ""})`
+          )
         }
       }
     },
@@ -76,7 +134,7 @@ export const EOCHooksPlugin = async ({
      * Action: Runs tsc --noEmit to check for type errors
      */
     "tool.execute.after": async (
-      input: { tool: string; args?: { filePath?: string } },
+      input: { tool: string; args?: { filePath?: string; command?: string } },
       output: unknown
     ) => {
       // Check if a TypeScript file was edited
@@ -84,82 +142,78 @@ export const EOCHooksPlugin = async ({
         input.tool === "edit" &&
         input.args?.filePath?.match(/\.tsx?$/)
       ) {
-        try {
-          await $`npx tsc --noEmit 2>&1`
+        // Use cross-platform runCommand to capture all output
+        const result = runCommand("npx", ["tsc", "--noEmit"])
+        
+        if (result.success) {
           log("info", "[EOC] TypeScript check passed")
-        } catch (error: unknown) {
-          const err = error as { stdout?: string }
+        } else {
           log("warn", "[EOC] TypeScript errors detected:")
-          if (err.stdout) {
-            // Log first few errors
-            const errors = err.stdout.split("\n").slice(0, 5)
-            errors.forEach((line: string) => log("warn", `  ${line}`))
+          // Log first few errors from stdout or stderr
+          const errorOutput = result.stdout || result.stderr
+          if (errorOutput) {
+            const errors = errorOutput.split("\n").slice(0, 5).filter(e => e.trim())
+            errors.forEach((line) => log("warn", `  ${line}`))
           }
         }
       }
 
-      // PR creation logging
-      if (input.tool === "bash" && input.args?.toString().includes("gh pr create")) {
-        log("info", "[EOC] PR created - check GitHub Actions status")
+      // Security check after bash execution
+      if (input.tool === "bash") {
+        const cmd = String(input.args?.command || "")
+        if (cmd.match(/rm\s+-rf/)) {
+          log("warn", "[EOC] Warning: Destructive command detected - " + cmd)
+        }
       }
     },
 
     /**
-     * Pre-Tool Security Check
-     * Equivalent to Claude Code PreToolUse hook
+     * Security Check Hook
+     * Equivalent to Claude Code PreToolUse hook for security
      *
-     * Triggers: Before tool execution
-     * Action: Warns about potential security issues
+     * Triggers: Before bash command execution
+     * Action: Checks for secrets and validates commands
      */
-    "tool.execute.before": async (
-      input: { tool: string; args?: Record<string, unknown> }
-    ) => {
-      // Git push review reminder
-      if (
-        input.tool === "bash" &&
-        input.args?.toString().includes("git push")
-      ) {
-        log(
-          "info",
-          "[EOC] Remember to review changes before pushing: git diff origin/main...HEAD"
-        )
-      }
+    "tool.execute.before": async (input: {
+      tool: string
+      args?: { command?: string }
+    }) => {
+      if (input.tool === "bash" && input.args?.command) {
+        const cmd = input.args.command
 
-      // Block creation of unnecessary documentation files
-      if (
-        input.tool === "write" &&
-        input.args?.filePath &&
-        typeof input.args.filePath === "string"
-      ) {
-        const filePath = input.args.filePath
-        if (
-          filePath.match(/\.(md|txt)$/i) &&
-          !filePath.includes("README") &&
-          !filePath.includes("CHANGELOG") &&
-          !filePath.includes("LICENSE") &&
-          !filePath.includes("CONTRIBUTING")
-        ) {
-          log(
-            "warn",
-            `[EOC] Creating ${filePath} - consider if this documentation is necessary`
-          )
+        // Check for potential secret exposure
+        const secretPatterns = [
+          /api[_-]?key\s*[:=]\s*['"][^'"]{20,}['"]/i,
+          /password\s*[:=]\s*['"][^'"]+['"]/i,
+          /secret\s*[:=]\s*['"][^'"]{10,}['"]/i,
+          /sk-[a-zA-Z0-9]{32,}/,
+          /ghp_[a-zA-Z0-9]{36}/,
+        ]
+
+        for (const pattern of secretPatterns) {
+          if (pattern.test(cmd)) {
+            log("error", "[EOC] Security: Potential secret in command blocked")
+            return { blocked: true, reason: "Potential secret exposure detected" }
+          }
+        }
+
+        // Check for dangerous commands
+        const dangerousPatterns = [
+          /rm\s+-rf\s+\//,
+          />\s*\/dev\/null.*rm/,
+          /curl.*\|.*sh/,
+          /wget.*\|.*sh/,
+        ]
+
+        for (const pattern of dangerousPatterns) {
+          if (pattern.test(cmd)) {
+            log("error", "[EOC] Security: Dangerous command pattern detected")
+            return { blocked: true, reason: "Dangerous command pattern" }
+          }
         }
       }
 
-      // Long-running command reminder
-      if (input.tool === "bash") {
-        const cmd = String(input.args?.command || input.args || "")
-        if (
-          cmd.match(/^(npm|pnpm|yarn|bun)\s+(install|build|test|run)/) ||
-          cmd.match(/^cargo\s+(build|test|run)/) ||
-          cmd.match(/^go\s+(build|test|run)/)
-        ) {
-          log(
-            "info",
-            "[EOC] Long-running command detected - consider using background execution"
-          )
-        }
-      }
+      return { blocked: false }
     },
 
     /**
@@ -172,14 +226,10 @@ export const EOCHooksPlugin = async ({
     "session.created": async () => {
       log("info", "[EOC] Session started - Everything Claude Code hooks active")
 
-      // Check for project-specific context files
-      try {
-        const hasClaudeMd = await $`test -f ${worktree}/CLAUDE.md && echo "yes"`.text()
-        if (hasClaudeMd.trim() === "yes") {
-          log("info", "[EOC] Found CLAUDE.md - loading project context")
-        }
-      } catch {
-        // No CLAUDE.md found
+      // Check for project-specific context files using cross-platform fs.existsSync
+      const claudeMdPath = worktree ? path.join(worktree, "CLAUDE.md") : "CLAUDE.md"
+      if (fs.existsSync(claudeMdPath)) {
+        log("info", "[EOC] Found CLAUDE.md - loading project context")
       }
     },
 
@@ -198,18 +248,14 @@ export const EOCHooksPlugin = async ({
       let totalConsoleLogCount = 0
       const filesWithConsoleLogs: string[] = []
 
+      // Use cross-platform countConsoleLogs instead of grep
       for (const file of editedFiles) {
         if (!file.match(/\.(ts|tsx|js|jsx)$/)) continue
 
-        try {
-          const result = await $`grep -c "console\\.log" ${file} 2>/dev/null`.text()
-          const count = parseInt(result.trim(), 10)
-          if (count > 0) {
-            totalConsoleLogCount += count
-            filesWithConsoleLogs.push(file)
-          }
-        } catch {
-          // No console.log found
+        const count = countConsoleLogs(file)
+        if (count > 0) {
+          totalConsoleLogCount += count
+          filesWithConsoleLogs.push(file)
         }
       }
 
@@ -226,11 +272,13 @@ export const EOCHooksPlugin = async ({
         log("info", "[EOC] Audit passed: No console.log statements found")
       }
 
-      // Desktop notification (macOS)
-      try {
-        await $`osascript -e 'display notification "Task completed!" with title "OpenCode EOC"' 2>/dev/null`
-      } catch {
-        // Notification not supported or failed
+      // Desktop notification (macOS only) - cross-platform check
+      if (process.platform === "darwin") {
+        const result = runCommand("osascript", [
+          "-e",
+          'display notification "Task completed!" with title "OpenCode EOC"'
+        ])
+        // Silently ignore if notification fails
       }
 
       // Clear tracked files for next task
@@ -291,7 +339,7 @@ export const EOCHooksPlugin = async ({
         PROJECT_ROOT: worktree || directory,
       }
 
-      // Detect package manager
+      // Detect package manager using cross-platform fs.existsSync
       const lockfiles: Record<string, string> = {
         "bun.lockb": "bun",
         "pnpm-lock.yaml": "pnpm",
@@ -299,16 +347,14 @@ export const EOCHooksPlugin = async ({
         "package-lock.json": "npm",
       }
       for (const [lockfile, pm] of Object.entries(lockfiles)) {
-        try {
-          await $`test -f ${worktree}/${lockfile}`
+        const lockfilePath = worktree ? path.join(worktree, lockfile) : lockfile
+        if (fs.existsSync(lockfilePath)) {
           env.PACKAGE_MANAGER = pm
           break
-        } catch {
-          // Not found, try next
         }
       }
 
-      // Detect languages
+      // Detect languages using cross-platform fs.existsSync
       const langDetectors: Record<string, string> = {
         "tsconfig.json": "typescript",
         "go.mod": "go",
@@ -318,11 +364,9 @@ export const EOCHooksPlugin = async ({
       }
       const detected: string[] = []
       for (const [file, lang] of Object.entries(langDetectors)) {
-        try {
-          await $`test -f ${worktree}/${file}`
+        const filePath = worktree ? path.join(worktree, file) : file
+        if (fs.existsSync(filePath)) {
           detected.push(lang)
-        } catch {
-          // Not found
         }
       }
       if (detected.length > 0) {
