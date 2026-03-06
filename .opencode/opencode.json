@@ -182,6 +182,10 @@
     "evolve": {
       "description": "Cluster instincts into skills",
       "template": "{file:./commands/evolve.md}\n\n$ARGUMENTS"
+    },
+    "hook-config": {
+      "description": "Configure hook runtime behavior",
+      "template": "{file:./commands/hook-config.md}\\n\\n$ARGUMENTS"
     }
   },
   "permission": {

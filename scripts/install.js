@@ -195,7 +195,7 @@ async function installProjectLevel() {
     }
   }
   
-  logSuccess('Project-level installation complete!')
+  await configureHooks(projectDir);logSuccess('Project-level installation complete!')
   logInfo('Run "opencode" in this directory to start.')
   
   return true
@@ -397,7 +397,7 @@ async function installGlobal() {
 /**
  * Main installation flow
  */
-async function main() {
+async function configureHooks(configDir){logInfo("Configuring hooks...");const p=path.join(configDir,".opencode","hooks-config.json");const ep=process.env.ECC_HOOK_PROFILE;const ed=process.env.ECC_DISABLED_HOOKS;const c={profile:ep||"standard",disabled:ed?ed.split(",").map(h=>h.trim()):[],overrides:{}};ensureDir(path.join(configDir,".opencode"));writeJson(p,c);if(ep){logSuccess("Hook profile: "+ep)}else{logSuccess("Hook config created")}} async function main() {
   console.log('')
   log('╔═══════════════════════════════════════════════════════════╗', 'bright')
   log('║                                                           ║', 'bright')

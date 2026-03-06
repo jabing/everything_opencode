@@ -51,6 +51,30 @@ After installation, restart OpenCode and verify:
 - Run `/help` to see all available commands
 
 
+## Environment Awareness
+
+### Current System
+Detect the operating system before executing shell commands:
+- Windows: process.platform === "win32"
+- macOS: process.platform === "darwin"
+- Linux: process.platform === "linux"
+
+### Cross-Platform Commands
+
+| Task | Linux/macOS | Windows |
+|------|-------------|---------|
+| List files | ls -la | dir |
+| Remove file | rm file | del file |
+| Copy file | cp src dest | copy src dest |
+| Create dir | mkdir -p dir | mkdir dir |
+| Cat file | cat file | type file |
+| Env var | $VAR | %VAR% |
+
+### Best Practices
+1. Prefer Node.js for cross-platform operations
+2. Use cross-platform tools: npm, node, git
+3. Detect OS before platform-specific commands
+
 ## Core Principles
 
 1. **Agent-First** — Delegate to specialized agents for domain tasks
