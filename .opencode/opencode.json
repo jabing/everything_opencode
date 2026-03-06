@@ -186,9 +186,13 @@
     "hook-config": {
       "description": "Configure hook runtime behavior",
       "template": "{file:./commands/hook-config.md}\\n\\n$ARGUMENTS"
+    },
+    "session-recover": {
+      "description": "Recover from crashed sessions",
+      "template": "{file:./commands/session-recover.md}\\n\\n$ARGUMENTS"
     }
   },
   "permission": {
     "mcp_*": "ask"
   }
-}
+}\n
