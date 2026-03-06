@@ -16,7 +16,8 @@
     "skills/verification-loop/SKILL.md",
     "skills/api-design/SKILL.md",
     "skills/strategic-compact/SKILL.md",
-    "skills/eval-harness/SKILL.md"
+    "skills/eval-harness/SKILL.md",
+    "skills/plankton-code-quality/SKILL.md"
   ],
   "plugin": [
     "./.opencode/plugins"
@@ -210,6 +211,10 @@
     "model-route": {
       "description": "Model routing configuration",
       "template": "{file:./commands/model-route.md}\\n\\n$ARGUMENTS"
+    },
+    "plankton": {
+      "description": "Code quality check",
+      "template": "{file:./commands/plankton.md}\\n\\n$ARGUMENTS"
     }
   },
   "permission": {
