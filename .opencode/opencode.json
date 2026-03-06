@@ -190,9 +190,29 @@
     "session-recover": {
       "description": "Recover from crashed sessions",
       "template": "{file:./commands/session-recover.md}\\n\\n$ARGUMENTS"
+    },
+    "harness-audit": {
+      "description": "Audit harness configuration",
+      "template": "{file:./commands/harness-audit.md}\\n\\n$ARGUMENTS"
+    },
+    "loop-start": {
+      "description": "Start autonomous loop",
+      "template": "{file:./commands/loop-start.md}\\n\\n$ARGUMENTS"
+    },
+    "loop-status": {
+      "description": "View loop status",
+      "template": "{file:./commands/loop-status.md}\\n\\n$ARGUMENTS"
+    },
+    "quality-gate": {
+      "description": "Quality gate check",
+      "template": "{file:./commands/quality-gate.md}\\n\\n$ARGUMENTS"
+    },
+    "model-route": {
+      "description": "Model routing configuration",
+      "template": "{file:./commands/model-route.md}\\n\\n$ARGUMENTS"
     }
   },
   "permission": {
     "mcp_*": "ask"
   }
-}\n
+}
