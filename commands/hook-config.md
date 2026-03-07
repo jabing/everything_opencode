@@ -22,8 +22,8 @@ Configure hook runtime behavior and environment variables.
 
 Set these before running OpenCode:
 
-export ECC_HOOK_PROFILE=standard
-export ECC_DISABLED_HOOKS=pre:bash:tmux-reminder,post:edit:typecheck
+export EOC_HOOK_PROFILE=standard
+export EOC_DISABLED_HOOKS=pre:bash:tmux-reminder,post:edit:typecheck
 
 ## Configuration File
 

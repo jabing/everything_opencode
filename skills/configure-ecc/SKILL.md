@@ -1,10 +1,10 @@
 ---
 name: configure-ecc
 description: Interactive installer for Everything Claude Code — guides users through selecting and installing skills and rules to user-level or project-level directories, verifies paths, and optionally optimizes installed files.
-origin: ECC
+origin: EOC
 ---
 
-# Configure Everything Claude Code (ECC)
+# Configure Everything Claude Code (EOC)
 
 An interactive, step-by-step installation wizard for the Everything Claude Code project. Uses `AskUserQuestion` to guide users through selective installation of skills and rules, then verifies correctness and offers optimization.
 
@@ -12,7 +12,7 @@ An interactive, step-by-step installation wizard for the Everything Claude Code 
 
 - User says "configure ecc", "install ecc", "setup everything claude code", or similar
 - User wants to selectively install skills or rules from this project
-- User wants to verify or fix an existing ECC installation
+- User wants to verify or fix an existing EOC installation
 - User wants to optimize installed skills or rules for their project
 
 ## Prerequisites
@@ -23,18 +23,18 @@ This skill must be accessible to Claude Code before activation. Two ways to boot
 
 ---
 
-## Step 0: Clone ECC Repository
+## Step 0: Clone EOC Repository
 
-Before any installation, clone the latest ECC source to `/tmp`:
+Before any installation, clone the latest EOC source to `/tmp`:
 
 ```bash
 rm -rf /tmp/everything-claude-code
 git clone https://github.com/affaan-m/everything-claude-code.git /tmp/everything-claude-code
 ```
 
-Set `ECC_ROOT=/tmp/everything-claude-code` as the source for all subsequent copy operations.
+Set `EOC_ROOT=/tmp/everything-claude-code` as the source for all subsequent copy operations.
 
-If the clone fails (network issues, etc.), use `AskUserQuestion` to ask the user to provide a local path to an existing ECC clone.
+If the clone fails (network issues, etc.), use `AskUserQuestion` to ask the user to provide a local path to an existing EOC clone.
 
 ---
 
@@ -43,7 +43,7 @@ If the clone fails (network issues, etc.), use `AskUserQuestion` to ask the user
 Use `AskUserQuestion` to ask the user where to install:
 
 ```
-Question: "Where should ECC components be installed?"
+Question: "Where should EOC components be installed?"
 Options:
   - "User-level (~/.claude/)" — "Applies to all your Claude Code projects"
   - "Project-level (.claude/)" — "Applies only to the current project"
@@ -133,7 +133,7 @@ For each selected category, print the full list of skills below and ask the user
 
 For each selected skill, copy the entire skill directory:
 ```bash
-cp -r $ECC_ROOT/skills/<skill-name> $TARGET/skills/
+cp -r $EOC_ROOT/skills/<skill-name> $TARGET/skills/
 ```
 
 Note: `continuous-learning` and `continuous-learning-v2` have extra files (config.json, hooks, scripts) — ensure the entire directory is copied, not just SKILL.md.
@@ -156,12 +156,12 @@ Options:
 Execute installation:
 ```bash
 # Common rules (flat copy into rules/)
-cp -r $ECC_ROOT/rules/common/* $TARGET/rules/
+cp -r $EOC_ROOT/rules/common/* $TARGET/rules/
 
 # Language-specific rules (flat copy into rules/)
-cp -r $ECC_ROOT/rules/typescript/* $TARGET/rules/   # if selected
-cp -r $ECC_ROOT/rules/python/* $TARGET/rules/        # if selected
-cp -r $ECC_ROOT/rules/golang/* $TARGET/rules/        # if selected
+cp -r $EOC_ROOT/rules/typescript/* $TARGET/rules/   # if selected
+cp -r $EOC_ROOT/rules/python/* $TARGET/rules/        # if selected
+cp -r $EOC_ROOT/rules/golang/* $TARGET/rules/        # if selected
 ```
 
 **Important**: If the user selects any language-specific rules but NOT common rules, warn them:
@@ -244,7 +244,7 @@ Options:
    - Security requirements
 3. Edit the rule files in-place at the installation target
 
-**Critical**: Only modify files in the installation target (`$TARGET/`), NEVER modify files in the source ECC repository (`$ECC_ROOT/`).
+**Critical**: Only modify files in the installation target (`$TARGET/`), NEVER modify files in the source EOC repository (`$EOC_ROOT/`).
 
 ---
 
@@ -259,7 +259,7 @@ rm -rf /tmp/everything-claude-code
 Then print a summary report:
 
 ```
-## ECC Installation Complete
+## EOC Installation Complete
 
 ### Installation Target
 - Level: [user-level / project-level / both]

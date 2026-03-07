@@ -15,7 +15,7 @@ English | [简体中文](#简体中文)
 - **Token Management Skill** - Proactive token monitoring and smart compaction
 - **Quick Reference Guide** - One-page token recovery cheat sheet
 
-### ECC v1.8.0 Improvements (2026-03-06)
+### EOC v1.8.0 Improvements (2026-03-06)
 
 - **Hook Runtime Controls** - Environment-based hook configuration
 - **Session Recovery** - Validate and recover corrupted sessions
