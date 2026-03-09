@@ -1,0 +1,48 @@
+{
+  "name": "easy-opencode",
+  "version": "1.9.1",
+  "description": "Production-ready AI coding plugin for OpenCode with 14 specialized agents, 50+ skills, 34 commands, and automated hook workflows.",
+  "main": "index.js",
+  "bin": {
+    "eoc-install": "./bin/eoc-install.js"
+  },
+  "scripts": {
+    "install": "node scripts/npm-install.js",
+    "postinstall": "node scripts/npm-postinstall.js"
+  },
+  "keywords": [
+    "opencode",
+    "ai",
+    "agents",
+    "coding",
+    "tdd",
+    "development",
+    "productivity"
+  ],
+  "author": "Everything OpenCode Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jabing/easy_opencode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jabing/easy_opencode/issues"
+  },
+  "homepage": "https://github.com/jabing/easy_opencode#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "agents/",
+    "skills/",
+    "commands/",
+    "prompts/",
+    ".opencode/",
+    "AGENTS.md",
+    "scripts/",
+    "bin/",
+    "logo.svg",
+    "favicon.ico",
+    "logo-monochrome.svg"
+  ]
+}
