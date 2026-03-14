@@ -2,7 +2,11 @@
 name: continuous-learning
 description: Automatically extract reusable patterns from Claude Code sessions and save them as learned skills for future use.
 origin: EOC
+deprecated: true
+superseded_by: continuous-learning-v2
 ---
+
+> ⚠️ **DEPRECATED**: This skill has been superseded by [`continuous-learning-v2`](../continuous-learning-v2/SKILL.md) which offers improved reliability with instinct-based architecture, confidence scoring, and PreToolUse/PostToolUse hooks. Consider migrating to v2 for better pattern extraction.
 
 # Continuous Learning Skill
 

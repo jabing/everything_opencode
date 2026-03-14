@@ -1,7 +1,8 @@
-# Everything OpenCode
+# Easy OpenCode
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub Stars](https://img.shields.io/github/stars/jabing/everything_opencode?style=social)](https://github.com/jabing/everything_opencode)
+[![GitHub Stars](https://img.shields.io/github/stars/jabing/easy_opencode?style=social)](https://github.com/jabing/easy_opencode)
+[![npm version](https://img.shields.io/npm/v/easy-opencode)](https://www.npmjs.com/package/easy-opencode)
 
 > Production-ready AI coding plugin for OpenCode with 14 specialized agents, 50+ skills, 34 commands, and automated hook workflows.
 
@@ -22,7 +23,7 @@ English | [简体中文](#简体中文)
 - **5 New Commands** - harness-audit, loop-start, loop-status, quality-gate, model-route
 - **Code Quality** - Prettier config and Plankton skill
 - **Test Infrastructure** - Jest setup for unit testing
-
+- **npm Installation** - Now installable via npm! 🎉
 
 ### 🤖 14 Specialized Agents
 
@@ -69,6 +70,9 @@ Smart hooks that run automatically:
 - **Shell Execution** - Build/test result analysis
 - **Session** - Start/end logging and cleanup
 - **Security** - Secret scanning, input validation
+
+## Installation
+
 ### Prerequisites
 
 First, install OpenCode:
@@ -83,8 +87,30 @@ npm install -g opencode
 opencode --version
 ```
 
+### Option 1: Install via npm (Recommended) ⭐
+
 ```bash
-git clone https://github.com/jabing/everything_opencode.git
+# Install EOC globally (run EOC installer in any project)
+npm install -g easy-opencode
+
+# Or use npx (no global install needed)
+npx easy-opencode install
+```
+
+Then run the installer in your project:
+```bash
+cd your-project
+eoc-install
+```
+
+Choose either:
+1. **Project-level** - Installs to `.opencode/` in current directory
+2. **Global** - Installs to OpenCode's global config directory
+
+### Option 2: Install via Git Clone
+
+```bash
+git clone https://github.com/jabing/easy_opencode.git
 cd everything_opencode
 node scripts/install.js
 ```
@@ -93,8 +119,26 @@ Choose either:
 1. **Project-level** - Installs to `.opencode/` in current directory
 2. **Global** - Installs to OpenCode's global config directory
 
+### Verification
 
+After installation, verify EOC is available:
 
+```bash
+# Check if OpenCode recognizes EOC agents
+opencode --help | grep -i agent
+
+# Start OpenCode in your project
+cd your-project
+opencode
+
+# In OpenCode, check available agents
+/agents
+```
+
+You should see:
+- **3 visible agents**: eoc_build, eoc_planner, eoc_code_reviewer
+- **11 hidden agents** (via slash commands): tdd-guide, security-reviewer, etc.
+- **33+ commands**: /plan, /tdd, /code-review, /security, etc.
 
 ## Project Structure
 
@@ -189,11 +233,43 @@ MIT License - see [LICENSE](LICENSE) for details.
 - **33 个命令** - `/plan`、`/tdd`、`/code-review`、`/security` 等快捷命令
 - **自动化钩子** - 文件编辑时自动格式化、类型检查、安全扫描
 
+### 安装方式
+
+#### 方式 1：通过 npm 安装（推荐）⭐
+
+```bash
+# 全局安装 EOC
+npm install -g easy-opencode
+
+# 或使用 npx（无需全局安装）
+npx easy-opencode install
+```
+
+然后在你的项目中运行安装程序：
+```bash
+cd your-project
+eoc-install
+```
+
+#### 方式 2：通过 Git 克隆
+
+```bash
+git clone https://github.com/jabing/easy_opencode.git
+cd everything_opencode
+node scripts/install.js
+```
+
 ### 快速开始
 
 ```bash
-git clone https://github.com/jabing/everything_opencode.git
-cd everything_opencode
+# 安装 EOC
+npm install -g easy-opencode
+
+# 在你的项目中
+cd your-project
+eoc-install
+
+# 启动 OpenCode
 opencode
 ```
 
@@ -207,4 +283,17 @@ opencode
 
 ---
 
-Made with ❤️ by the Everything OpenCode Team
+## 🎨 Project Branding
+
+### Icons
+
+- **Main Logo**: [logo.svg](logo.svg) (256x256) - Gradient purple design with "EOC" text
+- **Favicon**: [favicon.ico](favicon.ico) (32x32) - Purple square with "EOC" text  
+- **Monochrome Version**: [logo-monochrome.svg](logo-monochrome.svg) (256x256) - Black and white version for documentation
+
+### Brand Colors
+- **Primary**: #4F46E5 (Indigo)
+- **Secondary**: #7C3AED (Violet)
+- **Background**: #F3F4F6 (Light gray)
+
+Made with ❤️ by Easy OpenCode Team

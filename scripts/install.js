@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Everything OpenCode Installation Script
+ * Easy OpenCode Installation Script
  * 
  * Allows users to choose between:
  * - Project-level installation (current project only)
@@ -153,7 +153,7 @@ function writeJson(filePath, data) {
  * Install at project level
  */
 async function installProjectLevel() {
-  log('\n📦 Installing Everything OpenCode at PROJECT level...\n', 'bright')
+  log('\n📦 Installing Easy OpenCode at PROJECT level...\n', 'bright')
   
   const projectDir = process.cwd()
   const opencodeJsonPath = path.join(projectDir, 'opencode.json')
@@ -205,7 +205,7 @@ async function installProjectLevel() {
  * Install globally
  */
 async function installGlobal() {
-  log('\n🌍 Installing Everything OpenCode GLOBALLY...\n', 'bright')
+  log('\n🌍 Installing Easy OpenCode GLOBALLY...\n', 'bright')
   
   const globalConfigDir = getGlobalConfigDir()
   const globalConfigPath = path.join(globalConfigDir, 'opencode.json')
@@ -401,7 +401,7 @@ async function configureHooks(configDir){logInfo("Configuring hooks...");const p
   console.log('')
   log('╔═══════════════════════════════════════════════════════════╗', 'bright')
   log('║                                                           ║', 'bright')
-  log('║        🚀 Everything OpenCode Installer                   ║', 'bright')
+  log('║        🚀 Easy OpenCode Installer                   ║', 'bright')
   log('║                                                           ║', 'bright')
   log('║     AI-powered development agents for OpenCode            ║', 'bright')
   log('║                                                           ║', 'bright')

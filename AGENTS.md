@@ -18,7 +18,7 @@ opencode --version
 
 ### Quick Start
 ```bash
-git clone https://github.com/jabing/everything_opencode.git
+git clone https://github.com/jabing/easy_opencode.git
 cd everything_opencode
 node scripts/install.js
 ```

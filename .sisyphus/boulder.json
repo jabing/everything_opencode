@@ -1,10 +1,9 @@
 {
-  "active_plan": "C:\\dev_projects\\everything_opencode\\.sisyphus\\plans\\fix-tui-corruption.md",
-  "started_at": "2026-02-26T06:31:25.254Z",
+  "active_plan": "C:\\dev_projects\\easy_opencode\\.sisyphus\\plans\\npm-package-fix.md",
+  "started_at": "2026-03-12T15:51:55.768Z",
   "session_ids": [
-    "ses_367ba80f9ffeCS25U2KDEpYbpv",
-    "ses_3658dc48bffe8Lek7XblZYkbAC"
+    "ses_31d63e2bbffeuyWthggx5Y3w32"
   ],
-  "plan_name": "fix-tui-corruption",
+  "plan_name": "npm-package-fix",
   "agent": "atlas"
 }
